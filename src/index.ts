@@ -8,10 +8,8 @@ interface IScene extends Object {
   type: SceneType;
   color?: Color;
   colors?: ColorNumber[];
-  onColor?: Color;
-  offColor?: Color;
-  onTime?: number;
-  offTime?: number;
+  onColor?: ColorNumber;
+  offColor?: ColorNumber;
   pulses?: number;
 }
 
@@ -37,10 +35,8 @@ export interface ISceneFlow extends IScene {
 
 export interface ISceneStrobe extends IScene {
   type: "STROBE";
-  onColor: Color;
-  offColor: Color;
-  onTime: number;
-  offTime: number;
+  onColor: ColorNumber;
+  offColor: ColorNumber;
   pulses: number;
 }
 
@@ -158,16 +154,16 @@ export const encode = (o?: IScene): DluxLed => {
       break;
 
     case "STROBE":
-      ["onColor", "offColor", "pulses", "onTime", "offTime"].forEach(k => {
+      ["onColor", "offColor", "pulses"].forEach(k => {
         if (!o.hasOwnProperty(k)) {
           throw new Error(`Key ${k} not provided for STROBE scene`);
         }
       });
 
-      d.addColor(o.onColor!);
-      d.addByte(o.onTime!);
-      d.addColor(o.offColor!);
-      d.addByte(o.offTime!);
+      d.addColor(o.onColor![0]);
+      d.addByte(o.onColor![1]);
+      d.addColor(o.offColor![0]);
+      d.addByte(o.offColor![1]);
       d.addByte(o.pulses!);
 
       break;
