@@ -1,4 +1,4 @@
-import { encode, IScenePattern, ISceneStatic } from "../index";
+import { encode, IScenePattern, ISceneStatic, ISceneSwap } from "../index";
 
 test("off", () => {
   expect(encode()).toEqual({ scene: 1, data: Buffer.from([]) });
@@ -128,6 +128,100 @@ test("PATTERN throw", () => {
 
   // Color type mismatch
   o.pattern = [
+    [[0x01, 0x02], 2],
+    [0x01, 5],
+  ];
+  expect(() => encode(o)).toThrow();
+});
+
+test("SWAP HV color", () => {
+  const o: ISceneSwap = {
+    type: "SWAP",
+    swaps: [
+      [[0x01, 0x02], 5],
+      [[0x02, 0x03], 2],
+      [[0x10, 0x09], 3],
+    ],
+  };
+
+  expect(encode(o)).toEqual({ scene: 3, data: Buffer.from([0x01, 0x02, 5, 0x02, 0x03, 2, 0x10, 0x09, 3]) });
+
+  o.swaps = [
+    [[-1, 0], -1],
+    [[0x02, 0x03], 0],
+    [[255, 256], 257],
+  ];
+  expect(encode(o)).toEqual({ scene: 3, data: Buffer.from([0x0ff, 0x0ff, 0xff]) });
+});
+
+test("SWAP RGB color", () => {
+  const o: ISceneSwap = {
+    type: "SWAP",
+    swaps: [
+      [[0x01, 0x02, 0x03], 5],
+      [[0x02, 0x03, 0x04], 2],
+      [[0x10, 0x09, 0x08], 3],
+    ],
+  };
+
+  expect(encode(o)).toEqual({ scene: 23, data: Buffer.from([0x01, 0x02, 0x03, 5, 0x02, 0x03, 0x04, 2, 0x10, 0x09, 0x08, 3]) });
+
+  o.swaps = [
+    [[-1, 0, -3], -1],
+    [[0x02, 0x03, 0x04], 0],
+    [[255, 256, 257], 257],
+  ];
+  expect(encode(o)).toEqual({ scene: 23, data: Buffer.from([0x0ff, 0x0ff, 0xff, 0xff]) });
+});
+
+test("SWAP hue color", () => {
+  const o: ISceneSwap = {
+    type: "SWAP",
+    swaps: [
+      [0x01, 5],
+      [0x02, 2],
+      [0x03, 3],
+    ],
+  };
+
+  expect(encode(o)).toEqual({ scene: 43, data: Buffer.from([0x01, 5, 0x02, 2, 0x03, 3]) });
+
+  o.swaps = [
+    [-1, -1],
+    [0x10, 0],
+    [260, 260],
+  ];
+  expect(encode(o)).toEqual({ scene: 43, data: Buffer.from([0x0ff, 0xff]) });
+});
+
+test("SWAP throw", () => {
+  const o: ISceneSwap = {
+    type: "SWAP",
+    swaps: [
+      [0x01, 5],
+      [[0x01, 0x02], 2],
+    ],
+  };
+
+  // Color type mismatch
+  expect(() => encode(o)).toThrow();
+
+  // Color type mismatch
+  o.swaps = [
+    [0x01, 5],
+    [[0x01, 0x02, 0x03], 2],
+  ];
+  expect(() => encode(o)).toThrow();
+
+  // Color type mismatch
+  o.swaps = [
+    [[0x01, 0x02, 0x03], 2],
+    [0x01, 5],
+  ];
+  expect(() => encode(o)).toThrow();
+
+  // Color type mismatch
+  o.swaps = [
     [[0x01, 0x02], 2],
     [0x01, 5],
   ];

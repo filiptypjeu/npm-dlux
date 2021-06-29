@@ -3,11 +3,13 @@ export type HV = [number, number];
 type Color = RGB | HV | number;
 type SceneType = "OFF" | "STATIC" | "PATTERN" | "SWAP" | "FLOW" | "STROBE" | "CHASE";
 export type Pattern = [Color, number][];
+export type Swap = [Color, number][];
 
 interface IScene {
   type: SceneType;
   color?: Color;
   pattern?: Pattern;
+  swaps?: Swap;
 }
 
 export interface ISceneStatic extends IScene {
@@ -18,6 +20,11 @@ export interface ISceneStatic extends IScene {
 export interface IScenePattern extends IScene {
   type: "PATTERN";
   pattern: Pattern;
+}
+
+export interface ISceneSwap extends IScene {
+  type: "SWAP";
+  swaps: Swap;
 }
 
 interface DluxLed {
@@ -124,6 +131,19 @@ export const encode = (o?: IScene): DluxLed => {
       }
 
       o.pattern.forEach(p => {
+        if (p[1] <= 0) return;
+
+        d.addColor(p[0]);
+        d.addByte(p[1]);
+      });
+      break;
+
+    case "SWAP":
+      if (!o.swaps) {
+        throw new Error("No swaps provided for SWAP scene");
+      }
+
+      o.swaps.forEach(p => {
         if (p[1] <= 0) return;
 
         d.addColor(p[0]);
