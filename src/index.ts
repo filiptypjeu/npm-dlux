@@ -4,10 +4,15 @@ type Color = RGB | HV | number;
 type SceneType = "OFF" | "STATIC" | "PATTERN" | "SWAP" | "FLOW" | "STROBE" | "CHASE";
 export type ColorNumber = [Color, number];
 
-interface IScene {
+interface IScene extends Object {
   type: SceneType;
   color?: Color;
   colors?: ColorNumber[];
+  onColor?: Color;
+  offColor?: Color;
+  onTime?: number;
+  offTime?: number;
+  pulses?: number;
 }
 
 export interface ISceneStatic extends IScene {
@@ -28,6 +33,15 @@ export interface ISceneSwap extends IScene {
 export interface ISceneFlow extends IScene {
   type: "FLOW";
   colors: ColorNumber[];
+}
+
+export interface ISceneStrobe extends IScene {
+  type: "STROBE";
+  onColor: Color;
+  offColor: Color;
+  onTime: number;
+  offTime: number;
+  pulses: number;
 }
 
 interface DluxLed {
@@ -142,6 +156,23 @@ export const encode = (o?: IScene): DluxLed => {
         d.addByte(p[1]);
       });
       break;
+
+    case "STROBE":
+      ["onColor", "offColor", "pulses", "onTime", "offTime"].forEach(k => {
+        if (!o.hasOwnProperty(k)) {
+          throw new Error(`Key ${k} not provided for STROBE scene`);
+        }
+      });
+
+      d.addColor(o.onColor!);
+      d.addByte(o.onTime!);
+      d.addColor(o.offColor!);
+      d.addByte(o.offTime!);
+      d.addByte(o.pulses!);
+
+      break;
+
+
 
     default:
       throw new Error(`Unsupported scene "${o.type}"`);

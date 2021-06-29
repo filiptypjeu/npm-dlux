@@ -1,4 +1,4 @@
-import { encode, ISceneFlow, IScenePattern, ISceneStatic, ISceneSwap } from "../index";
+import { encode, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap } from "../index";
 
 test("off", () => {
   expect(encode()).toEqual({ scene: 1, data: Buffer.from([]) });
@@ -175,4 +175,78 @@ test("PATTERN/SWAP/FLOW throw", () => {
   expect(() => encode(o)).toThrow();
   expect(() => encode(o2)).toThrow();
   expect(() => encode(o3)).toThrow();
+});
+
+
+
+
+
+
+
+
+
+test("STROBE HV color", () => {
+  const o: ISceneStrobe = {
+    type: "STROBE",
+    onColor: [0x01, 0x02],
+    offColor: [0x02, 0x03],
+    onTime: 2,
+    offTime: 3,
+    pulses: 4,
+  };
+
+  expect(encode(o)).toEqual({ scene: 5, data: Buffer.from([0x01, 0x02, 2, 0x02, 0x03, 3, 4]) });
+
+  o.onTime = -1;
+  o.offTime = 1000;
+  expect(encode(o)).toEqual({ scene: 5, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 0xff, 4]) });
+});
+
+test("STROBE RGB color", () => {
+  const o: ISceneStrobe = {
+    type: "STROBE",
+    onColor: [0x01, 0x02, 0x03],
+    offColor: [0x02, 0x03, 0x04],
+    onTime: 2,
+    offTime: 3,
+    pulses: 4,
+  };
+
+  expect(encode(o)).toEqual({ scene: 25, data: Buffer.from([0x01, 0x02, 0x03, 2, 0x02, 0x03, 0x04, 3, 4]) });
+});
+
+test("STROBE hue color", () => {
+  const o: ISceneStrobe = {
+    type: "STROBE",
+    onColor: 0x01,
+    offColor: 0x02,
+    onTime: 2,
+    offTime: 3,
+    pulses: 4,
+  };
+
+  expect(encode(o)).toEqual({ scene: 45, data: Buffer.from([0x01, 2, 0x02, 3, 4]) });
+});
+
+test("STROBE throw", () => {
+  const o: ISceneStrobe = {
+    type: "STROBE",
+    onColor: [0x01, 0x02],
+    offColor: 0x02,
+    onTime: 2,
+    offTime: 3,
+    pulses: 4,
+  };
+
+  // Color type mismatch
+  expect(() => encode(o)).toThrow();
+
+  // Color type mismatch
+  o.offColor = [0x01, 0x02, 0x03];
+  expect(() => encode(o)).toThrow();
+
+  // Color type mismatch
+  o.onColor = [0x01, 0x02, 0x03];
+  o.offColor = 0x02;
+  expect(() => encode(o)).toThrow();
 });
