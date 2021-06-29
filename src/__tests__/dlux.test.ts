@@ -12,10 +12,7 @@ test("encode non-supported scene type throw", () => {
 test("encode color type mismatch throw", () => {
   const o: IScenePattern<HV> = {
     type: "PATTERN",
-    colors: [
-      [[0x55, 0x01], 1],
-      [0x55, 1] as unknown as [HV, number],
-    ],
+    colors: [[[0x55, 0x01], 1], [0x55, 1] as unknown as [HV, number]],
   };
 
   expect(() => encode(o)).toThrow();
