@@ -1,4 +1,4 @@
-import { encode, IScenePattern, ISceneStatic, ISceneSwap } from "../index";
+import { encode, ISceneFlow, IScenePattern, ISceneStatic, ISceneSwap } from "../index";
 
 test("off", () => {
   expect(encode()).toEqual({ scene: 1, data: Buffer.from([]) });
@@ -40,7 +40,7 @@ test("STATIC RGB color", () => {
   expect(encode(o)).toEqual({ scene: 21, data: Buffer.from([0x00, 0xff, 0xff]) });
 });
 
-test("PATTERN/SWAP HV color", () => {
+test("PATTERN/SWAP/FLOW HV color", () => {
   const o: IScenePattern = {
     type: "PATTERN",
     colors: [
@@ -50,22 +50,26 @@ test("PATTERN/SWAP HV color", () => {
     ],
   };
   const o2: ISceneSwap = { ...o, type: "SWAP" };
+  const o3: ISceneFlow = { ...o, type: "FLOW" };
 
   expect(encode(o)).toEqual({ scene: 2, data: Buffer.from([0x01, 0x02, 5, 0x02, 0x03, 2, 0x10, 0x09, 3]) });
   expect(encode(o2)).toEqual({ scene: 3, data: Buffer.from([0x01, 0x02, 5, 0x02, 0x03, 2, 0x10, 0x09, 3]) });
+  expect(encode(o3)).toEqual({ scene: 4, data: Buffer.from([0x01, 0x02, 5, 0x02, 0x03, 2, 0x10, 0x09, 3]) });
 
-  o2.colors = [
+  o.colors = [
     [[-1, 0], -1],
     [[0x02, 0x03], 0],
     [[255, 256], 257],
   ];
-  o.colors = o2.colors;
+  o2.colors = o.colors;
+  o3.colors = o.colors;
 
   expect(encode(o)).toEqual({ scene: 2, data: Buffer.from([0x0ff, 0x0ff, 0xff]) });
   expect(encode(o2)).toEqual({ scene: 3, data: Buffer.from([0x0ff, 0x0ff, 0xff]) });
+  expect(encode(o3)).toEqual({ scene: 4, data: Buffer.from([0x0ff, 0x0ff, 0xff]) });
 });
 
-test("PATTERN/SWAP RGB color", () => {
+test("PATTERN/SWAP/FLOW RGB color", () => {
   const o: IScenePattern = {
     type: "PATTERN",
     colors: [
@@ -75,9 +79,11 @@ test("PATTERN/SWAP RGB color", () => {
     ],
   };
   const o2: ISceneSwap = { ...o, type: "SWAP" };
+  const o3: ISceneFlow = { ...o, type: "FLOW" };
 
   expect(encode(o)).toEqual({ scene: 22, data: Buffer.from([0x01, 0x02, 0x03, 5, 0x02, 0x03, 0x04, 2, 0x10, 0x09, 0x08, 3]) });
   expect(encode(o2)).toEqual({ scene: 23, data: Buffer.from([0x01, 0x02, 0x03, 5, 0x02, 0x03, 0x04, 2, 0x10, 0x09, 0x08, 3]) });
+  expect(encode(o3)).toEqual({ scene: 24, data: Buffer.from([0x01, 0x02, 0x03, 5, 0x02, 0x03, 0x04, 2, 0x10, 0x09, 0x08, 3]) });
 
   o.colors = [
     [[-1, 0, -3], -1],
@@ -85,12 +91,14 @@ test("PATTERN/SWAP RGB color", () => {
     [[255, 256, 257], 257],
   ];
   o2.colors = o.colors;
+  o3.colors = o.colors;
 
   expect(encode(o)).toEqual({ scene: 22, data: Buffer.from([0x0ff, 0x0ff, 0xff, 0xff]) });
   expect(encode(o2)).toEqual({ scene: 23, data: Buffer.from([0x0ff, 0x0ff, 0xff, 0xff]) });
+  expect(encode(o3)).toEqual({ scene: 24, data: Buffer.from([0x0ff, 0x0ff, 0xff, 0xff]) });
 });
 
-test("PATTERN/SWAP hue color", () => {
+test("PATTERN/SWAP/FLOW hue color", () => {
   const o: IScenePattern = {
     type: "PATTERN",
     colors: [
@@ -100,9 +108,11 @@ test("PATTERN/SWAP hue color", () => {
     ],
   };
   const o2: ISceneSwap = { ...o, type: "SWAP" };
+  const o3: ISceneFlow = { ...o, type: "FLOW" };
 
   expect(encode(o)).toEqual({ scene: 42, data: Buffer.from([0x01, 5, 0x02, 2, 0x03, 3]) });
   expect(encode(o2)).toEqual({ scene: 43, data: Buffer.from([0x01, 5, 0x02, 2, 0x03, 3]) });
+  expect(encode(o3)).toEqual({ scene: 44, data: Buffer.from([0x01, 5, 0x02, 2, 0x03, 3]) });
 
   o.colors = [
     [-1, -1],
@@ -110,12 +120,14 @@ test("PATTERN/SWAP hue color", () => {
     [260, 260],
   ];
   o2.colors = o.colors;
+  o3.colors = o.colors;
 
   expect(encode(o)).toEqual({ scene: 42, data: Buffer.from([0x0ff, 0xff]) });
   expect(encode(o2)).toEqual({ scene: 43, data: Buffer.from([0x0ff, 0xff]) });
+  expect(encode(o3)).toEqual({ scene: 44, data: Buffer.from([0x0ff, 0xff]) });
 });
 
-test("PATTERN/SWAP throw", () => {
+test("PATTERN/SWAP/FLOW throw", () => {
   const o: IScenePattern = {
     type: "PATTERN",
     colors: [
@@ -124,10 +136,12 @@ test("PATTERN/SWAP throw", () => {
     ],
   };
   const o2: ISceneSwap = { ...o, type: "SWAP" };
+  const o3: ISceneFlow = { ...o, type: "FLOW" };
 
   // Color type mismatch
   expect(() => encode(o)).toThrow();
   expect(() => encode(o2)).toThrow();
+  expect(() => encode(o3)).toThrow();
 
   // Color type mismatch
   o.colors = [
@@ -135,8 +149,10 @@ test("PATTERN/SWAP throw", () => {
     [[0x01, 0x02, 0x03], 2],
   ];
   o2.colors = o.colors;
+  o3.colors = o.colors;
   expect(() => encode(o)).toThrow();
   expect(() => encode(o2)).toThrow();
+  expect(() => encode(o3)).toThrow();
 
   // Color type mismatch
   o.colors = [
@@ -144,8 +160,10 @@ test("PATTERN/SWAP throw", () => {
     [0x01, 5],
   ];
   o2.colors = o.colors;
+  o3.colors = o.colors;
   expect(() => encode(o)).toThrow();
   expect(() => encode(o2)).toThrow();
+  expect(() => encode(o3)).toThrow();
 
   // Color type mismatch
   o.colors = [
@@ -153,6 +171,8 @@ test("PATTERN/SWAP throw", () => {
     [0x01, 5],
   ];
   o2.colors = o.colors;
+  o3.colors = o.colors;
   expect(() => encode(o)).toThrow();
   expect(() => encode(o2)).toThrow();
+  expect(() => encode(o3)).toThrow();
 });

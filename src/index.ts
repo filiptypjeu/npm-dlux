@@ -25,6 +25,11 @@ export interface ISceneSwap extends IScene {
   colors: ColorNumber[];
 }
 
+export interface ISceneFlow extends IScene {
+  type: "FLOW";
+  colors: ColorNumber[];
+}
+
 interface DluxLed {
   scene: number;
   data: Buffer;
@@ -125,6 +130,7 @@ export const encode = (o?: IScene): DluxLed => {
 
     case "PATTERN":
     case "SWAP":
+    case "FLOW":
       if (!o.colors) {
         throw new Error(`No colors provided for ${o.type} scene`);
       }
