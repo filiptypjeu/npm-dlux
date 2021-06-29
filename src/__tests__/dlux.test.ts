@@ -127,15 +127,6 @@ test("PATTERN/SWAP/FLOW hue color", () => {
   expect(encode(o3)).toEqual({ scene: 44, data: Buffer.from([0x0ff, 0xff]) });
 });
 
-
-
-
-
-
-
-
-
-
 test("STROBE HV color", () => {
   const o: ISceneStrobe<HV> = {
     type: "STROBE",
@@ -178,9 +169,6 @@ test("STROBE hue color", () => {
 
   expect(encode(o)).toEqual({ scene: 45, data: Buffer.from([0x01, 2, 0x02, 3, 4]) });
 });
-
-
-
 
 test("CHASE HV color", () => {
   const o: ISceneChase<HV> = {

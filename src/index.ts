@@ -97,7 +97,7 @@ class InternalLedData {
         this.scene = 6;
         break;
       default:
-        throw(`Invalid scene type "${scene}"`)
+        throw new Error(`Invalid scene type "${scene}"`);
     }
   }
 
@@ -194,7 +194,9 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
       d.addColor(o.color2);
       d.addByte(o.sections);
       d.addByte(o.ledsPerSection);
-      d.addByte(BIT(o.comet) << 1 | BIT(o.reverse));
+      /* tslint:disable:no-bitwise */
+      d.addByte((BIT(o.comet) << 1) | BIT(o.reverse));
+      /* tslint:enable:no-bitwise */
       break;
     }
 
@@ -205,4 +207,4 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
   return d.build();
 };
 
-const BIT = (b?: boolean) => b ? 1 : 0;
+const BIT = (b?: boolean) => (b ? 1 : 0);
