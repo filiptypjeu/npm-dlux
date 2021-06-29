@@ -1,4 +1,4 @@
-import { encode, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap } from "../index";
+import { encode, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap } from "../index";
 
 test("off", () => {
   expect(encode()).toEqual({ scene: 1, data: Buffer.from([]) });
@@ -248,5 +248,84 @@ test("STROBE throw", () => {
   // Color type mismatch
   o.color = [0x01, 0x02, 0x03];
   o.color2 = 0x02;
+  expect(() => encode(o)).toThrow();
+});
+
+
+
+test("CHASE HV color", () => {
+  const o: ISceneChase = {
+    type: "CHASE",
+    color: [0x01, 0x02],
+    color2: [0x02, 0x03],
+    time: 10,
+    sections: 4,
+    ledsPerSection: 5,
+  };
+
+  expect(encode(o)).toEqual({ scene: 6, data: Buffer.from([0x01, 0x02, 10, 0x02, 0x03, 4, 5, 0]) });
+
+  o.time = -1;
+  expect(encode(o)).toEqual({ scene: 6, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 4, 5, 0]) });
+
+  o.ledsPerSection = 1000;
+  expect(encode(o)).toEqual({ scene: 6, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 4, 0xff, 0]) });
+
+  o.reverse = true;
+  expect(encode(o)).toEqual({ scene: 6, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 4, 0xff, 0b1]) });
+
+  o.comet = true;
+  expect(encode(o)).toEqual({ scene: 6, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 4, 0xff, 0b11]) });
+
+  o.reverse = false;
+  expect(encode(o)).toEqual({ scene: 6, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 4, 0xff, 0b10]) });
+
+  o.comet = false;
+  expect(encode(o)).toEqual({ scene: 6, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 4, 0xff, 0]) });
+});
+
+test("CHASE RGB color", () => {
+  const o: ISceneChase = {
+    type: "CHASE",
+    color: [0x01, 0x02, 0x03],
+    color2: [0x02, 0x03, 0x04],
+    time: 10,
+    sections: 4,
+    ledsPerSection: 5,
+    comet: true,
+    reverse: false,
+  };
+
+  expect(encode(o)).toEqual({ scene: 26, data: Buffer.from([0x01, 0x02, 0x03, 10, 0x02, 0x03, 0x04, 4, 5, 0b10]) });
+});
+
+test("CHASE hue color", () => {
+  const o: ISceneChase = {
+    type: "CHASE",
+    color: 0x01,
+    color2: 0x02,
+    time: 10,
+    sections: 4,
+    ledsPerSection: 5,
+    comet: true,
+    reverse: false,
+  };
+
+  expect(encode(o)).toEqual({ scene: 46, data: Buffer.from([0x01, 10, 0x02, 4, 5, 0b10]) });
+});
+
+test("CHASE throws", () => {
+  const o: ISceneChase = {
+    type: "CHASE",
+    color: 0x01,
+    color2: [0x02, 0x03],
+    time: 10,
+    sections: 4,
+    ledsPerSection: 5,
+    comet: true,
+    reverse: false,
+  };
+
+  // Color type mismatch
   expect(() => encode(o)).toThrow();
 });

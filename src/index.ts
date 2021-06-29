@@ -3,6 +3,7 @@ export type HV = [number, number];
 type Color = RGB | HV | number;
 type SceneType = "OFF" | "STATIC" | "PATTERN" | "SWAP" | "FLOW" | "STROBE" | "CHASE";
 type MS = number;
+type MS10 = number;
 type MS100 = number;
 type Leds = number;
 export type ColorNumber = [Color, number];
@@ -17,6 +18,10 @@ interface IScene extends Object {
   time?: number;
   time2?: number;
   pulses?: number;
+  sections?: number;
+  ledsPerSection?: number;
+  reverse?: boolean;
+  comet?: boolean;
 }
 
 export interface ISceneStatic extends IScene {
@@ -46,6 +51,17 @@ export interface ISceneStrobe extends IScene {
   time: MS;
   time2: MS;
   pulses: number;
+}
+
+export interface ISceneChase extends IScene {
+  type: "CHASE";
+  color: Color;
+  color2: Color;
+  time: MS10;
+  sections: number;
+  ledsPerSection: Leds;
+  reverse?: boolean;
+  comet?: boolean;
 }
 
 interface DluxLed {
@@ -169,7 +185,17 @@ export const encode = (scene?: IScene): DluxLed => {
       break;
     }
 
+    case "CHASE": {
+      const o = scene as ISceneChase;
 
+      d.addColor(o.color);
+      d.addByte(o.time);
+      d.addColor(o.color2);
+      d.addByte(o.sections);
+      d.addByte(o.ledsPerSection);
+      d.addByte(BIT(o.comet) << 1 | BIT(o.reverse));
+      break;
+    }
 
     default:
       throw new Error(`Unsupported scene "${scene.type}"`);
@@ -177,3 +203,5 @@ export const encode = (scene?: IScene): DluxLed => {
 
   return d.build();
 };
+
+const BIT = (b?: boolean) => b ? 1 : 0;
