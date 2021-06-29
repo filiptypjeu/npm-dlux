@@ -1,20 +1,21 @@
 export type RGB = [number, number, number];
 export type HV = [number, number];
-type Color = RGB | HV | number;
+export type Hue = number;
+type Color = RGB | HV | Hue;
 type SceneType = "OFF" | "STATIC" | "PATTERN" | "SWAP" | "FLOW" | "STROBE" | "CHASE";
 type MS = number;
 type MS10 = number;
 type MS100 = number;
 type Leds = number;
-export type ColorNumber = [Color, number];
-export type Pattern = [Color, Leds][];
-export type Swaps = [Color, MS100][];
+export type ColorNumber<T extends Color> = [T, number];
+export type Pattern<T extends Color> = [T, Leds][];
+export type Swaps<T extends Color> = [T, MS100][];
 
-interface IScene extends Object {
+interface IScene<T extends Color> extends Object {
   type: SceneType;
-  color?: Color;
-  color2?: Color;
-  colors?: ColorNumber[];
+  color?: T;
+  color2?: T;
+  colors?: ColorNumber<T>[];
   time?: number;
   time2?: number;
   pulses?: number;
@@ -24,39 +25,39 @@ interface IScene extends Object {
   comet?: boolean;
 }
 
-export interface ISceneStatic extends IScene {
+export interface ISceneStatic<T extends Color> extends IScene<T> {
   type: "STATIC";
-  color: Color;
+  color: T;
 }
 
-export interface IScenePattern extends IScene {
+export interface IScenePattern<T extends Color> extends IScene<T> {
   type: "PATTERN";
-  colors: Pattern;
+  colors: Pattern<T>;
 }
 
-export interface ISceneSwap extends IScene {
+export interface ISceneSwap<T extends Color> extends IScene<T> {
   type: "SWAP";
-  colors: Swaps;
+  colors: Swaps<T>;
 }
 
-export interface ISceneFlow extends IScene {
+export interface ISceneFlow<T extends Color> extends IScene<T> {
   type: "FLOW";
-  colors: Swaps;
+  colors: Swaps<T>;
 }
 
-export interface ISceneStrobe extends IScene {
+export interface ISceneStrobe<T extends Color> extends IScene<T> {
   type: "STROBE";
-  color: Color;
-  color2: Color;
+  color: T;
+  color2: T;
   time: MS;
   time2: MS;
   pulses: number;
 }
 
-export interface ISceneChase extends IScene {
+export interface ISceneChase<T extends Color> extends IScene<T> {
   type: "CHASE";
-  color: Color;
-  color2: Color;
+  color: T;
+  color2: T;
   time: MS10;
   sections: number;
   ledsPerSection: Leds;
@@ -142,7 +143,7 @@ class InternalLedData {
   };
 }
 
-export const encode = (scene?: IScene): DluxLed => {
+export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
   // OFF
   if (!scene) {
     return {
@@ -155,7 +156,7 @@ export const encode = (scene?: IScene): DluxLed => {
 
   switch (scene.type) {
     case "STATIC": {
-      const o = scene as ISceneStatic;
+      const o = scene as ISceneStatic<T>;
       d.addColor(o.color);
       break;
     }
@@ -163,7 +164,7 @@ export const encode = (scene?: IScene): DluxLed => {
     case "PATTERN":
     case "SWAP":
     case "FLOW": {
-      const o = scene as ISceneFlow;
+      const o = scene as ISceneFlow<T>;
 
       o.colors.forEach(p => {
         if (p[1] <= 0) return;
@@ -175,7 +176,7 @@ export const encode = (scene?: IScene): DluxLed => {
     }
 
     case "STROBE": {
-      const o = scene as ISceneStrobe;
+      const o = scene as ISceneStrobe<T>;
 
       d.addColor(o.color);
       d.addByte(o.time);
@@ -186,7 +187,7 @@ export const encode = (scene?: IScene): DluxLed => {
     }
 
     case "CHASE": {
-      const o = scene as ISceneChase;
+      const o = scene as ISceneChase<T>;
 
       d.addColor(o.color);
       d.addByte(o.time);
