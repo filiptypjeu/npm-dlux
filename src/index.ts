@@ -27,12 +27,34 @@ interface DluxLed {
 
 class InternalLedData {
   private bytes: number[] = [];
-  private scene: number = 1;
+  private scene: number;
   private colorType: number = 0;
 
-  constructor() {}
-
-  public setScene = (scene: number) => (this.scene = scene);
+  constructor(scene: SceneType) {
+    switch (scene) {
+      case "OFF":
+      case "STATIC":
+        this.scene = 1;
+        break;
+      case "PATTERN":
+        this.scene = 2;
+        break;
+      case "SWAP":
+        this.scene = 3;
+        break;
+      case "FLOW":
+        this.scene = 4;
+        break;
+      case "STROBE":
+        this.scene = 5;
+        break;
+      case "CHASE":
+        this.scene = 6;
+        break;
+      default:
+        throw(`Invalid scene type "${scene}"`)
+    }
+  }
 
   public addByte = (value: number) => this.bytes.push(Math.min(Math.max(value, 0), 255));
 
@@ -85,11 +107,10 @@ export const encode = (o?: IScene): DluxLed => {
     };
   }
 
-  const d = new InternalLedData();
+  const d = new InternalLedData(o.type);
 
   switch (o.type) {
     case "STATIC":
-      d.setScene(1);
       if (!o.color) {
         throw new Error("No color provided for STATIC scene");
       }
@@ -98,7 +119,6 @@ export const encode = (o?: IScene): DluxLed => {
       break;
 
     case "PATTERN":
-      d.setScene(2);
       if (!o.pattern) {
         throw new Error("No pattern provided for PATTERN scene");
       }
