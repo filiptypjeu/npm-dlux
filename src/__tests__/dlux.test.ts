@@ -1,5 +1,26 @@
 import { encode, Hue, HV, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, RGB } from "../index";
 
+test("encode non-supported scene type throw", () => {
+  const o: ISceneStatic<HV> = {
+    type: "nothing" as "STATIC",
+    color: [0x55, 0x01],
+  };
+
+  expect(() => encode(o)).toThrow();
+});
+
+test("encode color type mismatch throw", () => {
+  const o: IScenePattern<HV> = {
+    type: "PATTERN",
+    colors: [
+      [[0x55, 0x01], 1],
+      [0x55, 1] as unknown as [HV, number],
+    ],
+  };
+
+  expect(() => encode(o)).toThrow();
+});
+
 test("off", () => {
   expect(encode()).toEqual({ scene: 1, data: Buffer.from([]) });
 });
