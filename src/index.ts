@@ -126,32 +126,28 @@ class InternalLedData {
   };
 }
 
-export const encode = (o?: IScene): DluxLed => {
+export const encode = (scene?: IScene): DluxLed => {
   // OFF
-  if (!o) {
+  if (!scene) {
     return {
       scene: 1,
       data: Buffer.from(""),
     };
   }
 
-  const d = new InternalLedData(o.type);
+  const d = new InternalLedData(scene.type);
 
-  switch (o.type) {
-    case "STATIC":
-      if (!o.color) {
-        throw new Error("No color provided for STATIC scene");
-      }
-
+  switch (scene.type) {
+    case "STATIC": {
+      const o = scene as ISceneStatic;
       d.addColor(o.color);
       break;
+    }
 
     case "PATTERN":
     case "SWAP":
-    case "FLOW":
-      if (!o.colors) {
-        throw new Error(`No colors provided for ${o.type} scene`);
-      }
+    case "FLOW": {
+      const o = scene as ISceneFlow;
 
       o.colors.forEach(p => {
         if (p[1] <= 0) return;
@@ -160,25 +156,23 @@ export const encode = (o?: IScene): DluxLed => {
         d.addByte(p[1]);
       });
       break;
+    }
 
-    case "STROBE":
-      ["color", "color2", "time", "time2", "pulses"].forEach(k => {
-        if (!o.hasOwnProperty(k)) {
-          throw new Error(`Key ${k} not provided for STROBE scene`);
-        }
-      });
+    case "STROBE": {
+      const o = scene as ISceneStrobe;
 
-      d.addColor(o.color!);
-      d.addByte(o.time!);
-      d.addColor(o.color2!);
-      d.addByte(o.time2!);
-      d.addByte(o.pulses!);
+      d.addColor(o.color);
+      d.addByte(o.time);
+      d.addColor(o.color2);
+      d.addByte(o.time2);
+      d.addByte(o.pulses);
       break;
+    }
 
 
 
     default:
-      throw new Error(`Unsupported scene "${o.type}"`);
+      throw new Error(`Unsupported scene "${scene.type}"`);
   }
 
   return d.build();
