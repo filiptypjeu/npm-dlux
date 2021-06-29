@@ -2,14 +2,20 @@ export type RGB = [number, number, number];
 export type HV = [number, number];
 type Color = RGB | HV | number;
 type SceneType = "OFF" | "STATIC" | "PATTERN" | "SWAP" | "FLOW" | "STROBE" | "CHASE";
+type MS = number;
+type MS100 = number;
+type Leds = number;
 export type ColorNumber = [Color, number];
+export type Pattern = [Color, Leds][];
+export type Swaps = [Color, MS100][];
 
 interface IScene extends Object {
   type: SceneType;
   color?: Color;
+  color2?: Color;
   colors?: ColorNumber[];
-  onColor?: ColorNumber;
-  offColor?: ColorNumber;
+  time?: number;
+  time2?: number;
   pulses?: number;
 }
 
@@ -20,23 +26,25 @@ export interface ISceneStatic extends IScene {
 
 export interface IScenePattern extends IScene {
   type: "PATTERN";
-  colors: ColorNumber[];
+  colors: Pattern;
 }
 
 export interface ISceneSwap extends IScene {
   type: "SWAP";
-  colors: ColorNumber[];
+  colors: Swaps;
 }
 
 export interface ISceneFlow extends IScene {
   type: "FLOW";
-  colors: ColorNumber[];
+  colors: Swaps;
 }
 
 export interface ISceneStrobe extends IScene {
   type: "STROBE";
-  onColor: ColorNumber;
-  offColor: ColorNumber;
+  color: Color;
+  color2: Color;
+  time: MS;
+  time2: MS;
   pulses: number;
 }
 
@@ -154,18 +162,17 @@ export const encode = (o?: IScene): DluxLed => {
       break;
 
     case "STROBE":
-      ["onColor", "offColor", "pulses"].forEach(k => {
+      ["color", "color2", "time", "time2", "pulses"].forEach(k => {
         if (!o.hasOwnProperty(k)) {
           throw new Error(`Key ${k} not provided for STROBE scene`);
         }
       });
 
-      d.addColor(o.onColor![0]);
-      d.addByte(o.onColor![1]);
-      d.addColor(o.offColor![0]);
-      d.addByte(o.offColor![1]);
+      d.addColor(o.color!);
+      d.addByte(o.time!);
+      d.addColor(o.color2!);
+      d.addByte(o.time2!);
       d.addByte(o.pulses!);
-
       break;
 
 

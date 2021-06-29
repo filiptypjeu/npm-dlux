@@ -188,23 +188,27 @@ test("PATTERN/SWAP/FLOW throw", () => {
 test("STROBE HV color", () => {
   const o: ISceneStrobe = {
     type: "STROBE",
-    onColor: [[0x01, 0x02], 2],
-    offColor: [[0x02, 0x03], 3],
+    color: [0x01, 0x02],
+    color2: [0x02, 0x03],
+    time: 2,
+    time2: 3,
     pulses: 4,
   };
 
   expect(encode(o)).toEqual({ scene: 5, data: Buffer.from([0x01, 0x02, 2, 0x02, 0x03, 3, 4]) });
 
-  o.onColor = [[0x01, 0x02], -1];
-  o.offColor = [[0x02, 0x03], 1000];
+  o.time = -1;
+  o.time2 = 1000;
   expect(encode(o)).toEqual({ scene: 5, data: Buffer.from([0x01, 0x02, 0, 0x02, 0x03, 0xff, 4]) });
 });
 
 test("STROBE RGB color", () => {
   const o: ISceneStrobe = {
     type: "STROBE",
-    onColor: [[0x01, 0x02, 0x03], 2],
-    offColor: [[0x02, 0x03, 0x04], 3],
+    color: [0x01, 0x02, 0x03],
+    color2: [0x02, 0x03, 0x04],
+    time: 2,
+    time2: 3,
     pulses: 4,
   };
 
@@ -214,8 +218,10 @@ test("STROBE RGB color", () => {
 test("STROBE hue color", () => {
   const o: ISceneStrobe = {
     type: "STROBE",
-    onColor: [0x01, 2],
-    offColor: [0x02, 3],
+    color: 0x01,
+    color2: 0x02,
+    time: 2,
+    time2: 3,
     pulses: 4,
   };
 
@@ -225,8 +231,10 @@ test("STROBE hue color", () => {
 test("STROBE throw", () => {
   const o: ISceneStrobe = {
     type: "STROBE",
-    onColor: [[0x01, 0x02], 2],
-    offColor: [0x02, 3],
+    color: [0x01, 0x02],
+    color2: 0x02,
+    time: 2,
+    time2: 3,
     pulses: 4,
   };
 
@@ -234,11 +242,11 @@ test("STROBE throw", () => {
   expect(() => encode(o)).toThrow();
 
   // Color type mismatch
-  o.offColor = [[0x01, 0x02, 0x03], 3];
+  o.color2 = [0x01, 0x02, 0x03];
   expect(() => encode(o)).toThrow();
 
   // Color type mismatch
-  o.onColor = [[0x01, 0x02, 0x03], 2];
-  o.offColor = [0x02, 3];
+  o.color = [0x01, 0x02, 0x03];
+  o.color2 = 0x02;
   expect(() => encode(o)).toThrow();
 });
