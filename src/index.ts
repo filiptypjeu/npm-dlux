@@ -2,14 +2,12 @@ export type RGB = [number, number, number];
 export type HV = [number, number];
 type Color = RGB | HV | number;
 type SceneType = "OFF" | "STATIC" | "PATTERN" | "SWAP" | "FLOW" | "STROBE" | "CHASE";
-export type Pattern = [Color, number][];
-export type Swap = [Color, number][];
+export type ColorNumber = [Color, number];
 
 interface IScene {
   type: SceneType;
   color?: Color;
-  pattern?: Pattern;
-  swaps?: Swap;
+  colors?: ColorNumber[];
 }
 
 export interface ISceneStatic extends IScene {
@@ -19,12 +17,12 @@ export interface ISceneStatic extends IScene {
 
 export interface IScenePattern extends IScene {
   type: "PATTERN";
-  pattern: Pattern;
+  colors: ColorNumber[];
 }
 
 export interface ISceneSwap extends IScene {
   type: "SWAP";
-  swaps: Swap;
+  colors: ColorNumber[];
 }
 
 interface DluxLed {
@@ -126,24 +124,12 @@ export const encode = (o?: IScene): DluxLed => {
       break;
 
     case "PATTERN":
-      if (!o.pattern) {
-        throw new Error("No pattern provided for PATTERN scene");
-      }
-
-      o.pattern.forEach(p => {
-        if (p[1] <= 0) return;
-
-        d.addColor(p[0]);
-        d.addByte(p[1]);
-      });
-      break;
-
     case "SWAP":
-      if (!o.swaps) {
-        throw new Error("No swaps provided for SWAP scene");
+      if (!o.colors) {
+        throw new Error(`No colors provided for ${o.type} scene`);
       }
 
-      o.swaps.forEach(p => {
+      o.colors.forEach(p => {
         if (p[1] <= 0) return;
 
         d.addColor(p[0]);
