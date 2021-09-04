@@ -2,7 +2,21 @@ export type RGB = [number, number, number];
 export type HV = [number, number];
 export type Hue = number;
 type Color = RGB | HV | Hue;
-type SceneType = "OFF" | "STATIC" | "PATTERN" | "SWAP" | "FLOW" | "STROBE" | "CHASE";
+enum ColorType {
+  Hue = 1,
+  HV = 2,
+  RGB = 3,
+  RGBW = 4,
+}
+enum SceneType {
+  OFF = 0,
+  STATIC,
+  PATTERN,
+  SWAP,
+  FLOW,
+  STROBE,
+  CHASE,
+};
 type MS = number;
 type MS10 = number;
 type MS100 = number;
@@ -12,7 +26,7 @@ export type Pattern<T extends Color> = [T, Leds][];
 export type Swaps<T extends Color> = [T, MS100][];
 
 interface IScene<T extends Color> extends Object {
-  type: SceneType;
+  type: keyof typeof SceneType;
   color?: T;
   color2?: T;
   colors?: ColorNumber<T>[];
@@ -75,7 +89,7 @@ class InternalLedData {
   private scene: number;
   private colorType: number = 0;
 
-  constructor(scene: SceneType) {
+  constructor(scene: keyof typeof SceneType) {
     switch (scene) {
       case "OFF":
       case "STATIC":
