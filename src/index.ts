@@ -16,7 +16,7 @@ enum SceneType {
   FLOW,
   STROBE,
   CHASE,
-};
+}
 type MS = number;
 type MS10 = number;
 type MS100 = number;
@@ -93,7 +93,6 @@ export interface DluxLedStatus {
   bufferSize: number;
   colorType: keyof typeof ColorType | "ERROR";
 }
-
 
 const BIT = (b?: boolean) => (b ? 1 : 0);
 
@@ -241,8 +240,8 @@ export const decode = (msg: string): DluxLedStatus => {
     dataOn: a[1] === "1",
     sceneOn: a[2] === "1",
     sceneUpdating: a[3] === "1",
-    scene: Number(a[4]) in SceneType ? SceneType[Number(a[4])] as keyof typeof SceneType : "ERROR",
+    scene: Number(a[4]) in SceneType ? (SceneType[Number(a[4])] as keyof typeof SceneType) : "ERROR",
     bufferSize: Number(a[5]) || 0,
-    colorType: Number(a[6]) in ColorType ? ColorType[Number(a[6])] as keyof typeof ColorType : "ERROR",
+    colorType: Number(a[6]) in ColorType ? (ColorType[Number(a[6])] as keyof typeof ColorType) : "ERROR",
   };
 };
