@@ -1,4 +1,3 @@
-
 export type Hue = number;
 export type HV = [number, number];
 export type RGB = [number, number, number];
