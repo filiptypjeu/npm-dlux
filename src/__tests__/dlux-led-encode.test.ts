@@ -1,4 +1,4 @@
-import { encode, Hue, HV, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, RGB } from "../index";
+import { encode, Hue, HV, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, RGB, RGBW } from "../index";
 
 test("encode non-supported scene type throw", () => {
   const o: ISceneStatic<HV> = {
@@ -34,6 +34,18 @@ test("STATIC HV color", () => {
   expect(encode(o)).toEqual({ scene: 1, data: Buffer.from([0xff, 0x00]) });
 });
 
+test("STATIC RGB color", () => {
+  const o: ISceneStatic<RGB> = {
+    type: "STATIC",
+    color: [0x33, 0x44, 0x55],
+  };
+
+  expect(encode(o)).toEqual({ scene: 21, data: Buffer.from([0x33, 0x44, 0x55]) });
+
+  o.color = [-25, 256, 255];
+  expect(encode(o)).toEqual({ scene: 21, data: Buffer.from([0x00, 0xff, 0xff]) });
+});
+
 test("STATIC hue color", () => {
   const o: ISceneStatic<Hue> = {
     type: "STATIC",
@@ -46,16 +58,16 @@ test("STATIC hue color", () => {
   expect(encode(o)).toEqual({ scene: 41, data: Buffer.from([0x00]) });
 });
 
-test("STATIC RGB color", () => {
-  const o: ISceneStatic<RGB> = {
+test("STATIC RGBW color", () => {
+  const o: ISceneStatic<RGBW> = {
     type: "STATIC",
-    color: [0x33, 0x44, 0x55],
+    color: [0x33, 0x44, 0x55, 0x66],
   };
 
-  expect(encode(o)).toEqual({ scene: 21, data: Buffer.from([0x33, 0x44, 0x55]) });
+  expect(encode(o)).toEqual({ scene: 61, data: Buffer.from([0x33, 0x44, 0x55, 0x66]) });
 
-  o.color = [-25, 256, 255];
-  expect(encode(o)).toEqual({ scene: 21, data: Buffer.from([0x00, 0xff, 0xff]) });
+  o.color = [-25, 256, 255, -25];
+  expect(encode(o)).toEqual({ scene: 61, data: Buffer.from([0x00, 0xff, 0xff, 0x00]) });
 });
 
 test("PATTERN/SWAP/FLOW HV color", () => {
@@ -145,6 +157,35 @@ test("PATTERN/SWAP/FLOW hue color", () => {
   expect(encode(o3)).toEqual({ scene: 44, data: Buffer.from([0x0ff, 0xff]) });
 });
 
+test("PATTERN/SWAP/FLOW RGBW color", () => {
+  const o: IScenePattern<RGBW> = {
+    type: "PATTERN",
+    colors: [
+      [[0x01, 0x02, 0x03, 0x20], 5],
+      [[0x02, 0x03, 0x04, 0x21], 2],
+      [[0x10, 0x09, 0x08, 0x22], 3],
+    ],
+  };
+  const o2: ISceneSwap<RGBW> = { ...o, type: "SWAP" };
+  const o3: ISceneFlow<RGBW> = { ...o, type: "FLOW" };
+
+  expect(encode(o)).toEqual({ scene: 62, data: Buffer.from([0x01, 0x02, 0x03, 0x20, 5, 0x02, 0x03, 0x04, 0x21, 2, 0x10, 0x09, 0x08, 0x22, 3]) });
+  expect(encode(o2)).toEqual({ scene: 63, data: Buffer.from([0x01, 0x02, 0x03, 0x20, 5, 0x02, 0x03, 0x04, 0x21, 2, 0x10, 0x09, 0x08, 0x22, 3]) });
+  expect(encode(o3)).toEqual({ scene: 64, data: Buffer.from([0x01, 0x02, 0x03, 0x20, 5, 0x02, 0x03, 0x04, 0x21, 2, 0x10, 0x09, 0x08, 0x22, 3]) });
+
+  o.colors = [
+    [[-1, 0, -3, -1], -1],
+    [[0x02, 0x03, 0x04, 0x12], 0],
+    [[255, 256, 257, 1000], 257],
+  ];
+  o2.colors = o.colors;
+  o3.colors = o.colors;
+
+  expect(encode(o)).toEqual({ scene: 62, data: Buffer.from([0x0ff, 0x0ff, 0xff, 0xff, 0xff]) });
+  expect(encode(o2)).toEqual({ scene: 63, data: Buffer.from([0x0ff, 0x0ff, 0xff, 0xff, 0xff]) });
+  expect(encode(o3)).toEqual({ scene: 64, data: Buffer.from([0x0ff, 0x0ff, 0xff, 0xff, 0xff]) });
+});
+
 test("STROBE HV color", () => {
   const o: ISceneStrobe<HV> = {
     type: "STROBE",
@@ -186,6 +227,19 @@ test("STROBE hue color", () => {
   };
 
   expect(encode(o)).toEqual({ scene: 45, data: Buffer.from([0x01, 2, 0x02, 3, 4]) });
+});
+
+test("STROBE RGBW color", () => {
+  const o: ISceneStrobe<RGBW> = {
+    type: "STROBE",
+    color: [0x01, 0x02, 0x03, 0x20],
+    color2: [0x02, 0x03, 0x04, 0x21],
+    time: 2,
+    time2: 3,
+    pulses: 4,
+  };
+
+  expect(encode(o)).toEqual({ scene: 65, data: Buffer.from([0x01, 0x02, 0x03, 0x20, 2, 0x02, 0x03, 0x04, 0x21, 3, 4]) });
 });
 
 test("CHASE HV color", () => {
@@ -247,4 +301,19 @@ test("CHASE hue color", () => {
   };
 
   expect(encode(o)).toEqual({ scene: 46, data: Buffer.from([0x01, 10, 0x02, 4, 5, 0b10]) });
+});
+
+test("CHASE RGBW color", () => {
+  const o: ISceneChase<RGBW> = {
+    type: "CHASE",
+    color: [0x01, 0x02, 0x03, 0x20],
+    color2: [0x02, 0x03, 0x04, 0x21],
+    time: 10,
+    sections: 4,
+    ledsPerSection: 5,
+    comet: true,
+    reverse: false,
+  };
+
+  expect(encode(o)).toEqual({ scene: 66, data: Buffer.from([0x01, 0x02, 0x03, 0x20, 10, 0x02, 0x03, 0x04, 0x21, 4, 5, 0b10]) });
 });

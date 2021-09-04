@@ -1,7 +1,9 @@
-export type RGB = [number, number, number];
-export type HV = [number, number];
+
 export type Hue = number;
-type Color = RGB | HV | Hue;
+export type HV = [number, number];
+export type RGB = [number, number, number];
+export type RGBW = [number, number, number, number];
+type Color = Hue | HV | RGB | RGBW;
 enum ColorType {
   Hue = 1,
   HV = 2,
@@ -134,6 +136,10 @@ class InternalLedData {
 
       case 3:
         s += 20;
+        break;
+
+      case 4:
+        s += 60;
         break;
 
       default:
