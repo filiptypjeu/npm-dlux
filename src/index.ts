@@ -79,10 +79,23 @@ export interface ISceneChase<T extends Color> extends IScene<T> {
   comet?: boolean;
 }
 
-interface DluxLed {
+export interface DluxLed {
   scene: number;
   data: Buffer;
 }
+
+export interface DluxLedStatus {
+  powerOn: boolean;
+  dataOn: boolean;
+  sceneOn: boolean;
+  sceneUpdating: boolean;
+  scene: keyof typeof SceneType | "ERROR";
+  bufferSize: number;
+  colorType: keyof typeof ColorType | "ERROR";
+}
+
+
+const BIT = (b?: boolean) => (b ? 1 : 0);
 
 class InternalLedData {
   private bytes: number[] = [];
@@ -221,4 +234,15 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
   return d.build();
 };
 
-const BIT = (b?: boolean) => (b ? 1 : 0);
+export const decode = (msg: string): DluxLedStatus => {
+  const a = msg.split(":");
+  return {
+    powerOn: a[0] === "1",
+    dataOn: a[1] === "1",
+    sceneOn: a[2] === "1",
+    sceneUpdating: a[3] === "1",
+    scene: Number(a[4]) in SceneType ? SceneType[Number(a[4])] as keyof typeof SceneType : "ERROR",
+    bufferSize: Number(a[5]) || 0,
+    colorType: Number(a[6]) in ColorType ? ColorType[Number(a[6])] as keyof typeof ColorType : "ERROR",
+  };
+};
