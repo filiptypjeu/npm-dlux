@@ -19,7 +19,7 @@ test("encode color type mismatch throw", () => {
 });
 
 test("off", () => {
-  expect(encode()).toEqual({ scene: 1, data: Buffer.from([]) });
+  expect(encode()).toEqual({ scene: 0, data: Buffer.from([]) });
 });
 
 test("STATIC HV color", () => {

@@ -10,12 +10,12 @@ enum ColorType {
 }
 enum SceneType {
   OFF = 0,
-  STATIC,
-  PATTERN,
-  SWAP,
-  FLOW,
-  STROBE,
-  CHASE,
+  STATIC = 1,
+  PATTERN = 2,
+  SWAP = 3,
+  FLOW = 4,
+  STROBE = 5,
+  CHASE = 6,
 }
 type MS = number;
 type MS10 = number;
@@ -97,34 +97,12 @@ export interface DluxLedStatus {
 const BIT = (b?: boolean) => (b ? 1 : 0);
 
 class InternalLedData {
-  private bytes: number[] = [];
-  private scene: number;
+  private readonly bytes: number[] = [];
+  private readonly scene: number;
   private colorType: number = 0;
 
   constructor(scene: keyof typeof SceneType) {
-    switch (scene) {
-      case "OFF":
-      case "STATIC":
-        this.scene = 1;
-        break;
-      case "PATTERN":
-        this.scene = 2;
-        break;
-      case "SWAP":
-        this.scene = 3;
-        break;
-      case "FLOW":
-        this.scene = 4;
-        break;
-      case "STROBE":
-        this.scene = 5;
-        break;
-      case "CHASE":
-        this.scene = 6;
-        break;
-      default:
-        throw new Error(`Invalid scene type "${scene}"`);
-    }
+    this.scene = SceneType[scene];
   }
 
   public addByte = (value: number) => this.bytes.push(Math.min(Math.max(value, 0), 255));
@@ -173,7 +151,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
   // OFF
   if (!scene) {
     return {
-      scene: 1,
+      scene: 0,
       data: Buffer.from(""),
     };
   }
