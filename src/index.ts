@@ -2,14 +2,16 @@ export type Hue = number;
 export type HV = [number, number];
 export type RGB = [number, number, number];
 export type RGBW = [number, number, number, number];
-type Color = Hue | HV | RGB | RGBW;
-enum ColorType {
+export type Color = Hue | HV | RGB | RGBW;
+export enum ColorType {
+  ERROR = -1,
   Hue = 1,
   HV = 2,
   RGB = 3,
   RGBW = 4,
 }
-enum SceneType {
+export enum SceneType {
+  ERROR = -1,
   OFF = 0,
   STATIC = 1,
   PATTERN = 2,
@@ -18,16 +20,16 @@ enum SceneType {
   STROBE = 5,
   CHASE = 6,
 }
-type MS = number;
-type MS10 = number;
-type MS100 = number;
-type Leds = number;
+export type MS = number;
+export type MS10 = number;
+export type MS100 = number;
+export type Leds = number;
 export type ColorNumber<T extends Color> = [T, number];
 export type Pattern<T extends Color> = [T, Leds][];
 export type Swaps<T extends Color> = [T, MS100][];
 
 interface IScene<T extends Color> extends Object {
-  type: keyof typeof SceneType;
+  type: SceneType;
   color?: T;
   color2?: T;
   colors?: ColorNumber<T>[];
@@ -41,27 +43,27 @@ interface IScene<T extends Color> extends Object {
 }
 
 export interface ISceneStatic<T extends Color> extends IScene<T> {
-  type: "STATIC";
+  type: SceneType.STATIC;
   color: T;
 }
 
 export interface IScenePattern<T extends Color> extends IScene<T> {
-  type: "PATTERN";
+  type: SceneType.PATTERN;
   colors: Pattern<T>;
 }
 
 export interface ISceneSwap<T extends Color> extends IScene<T> {
-  type: "SWAP";
+  type: SceneType.SWAP;
   colors: Swaps<T>;
 }
 
 export interface ISceneFlow<T extends Color> extends IScene<T> {
-  type: "FLOW";
+  type: SceneType.FLOW;
   colors: Swaps<T>;
 }
 
 export interface ISceneStrobe<T extends Color> extends IScene<T> {
-  type: "STROBE";
+  type: SceneType.STROBE;
   color: T;
   color2: T;
   time: MS;
@@ -70,7 +72,7 @@ export interface ISceneStrobe<T extends Color> extends IScene<T> {
 }
 
 export interface ISceneChase<T extends Color> extends IScene<T> {
-  type: "CHASE";
+  type: SceneType.CHASE;
   color: T;
   color2: T;
   time: MS10;
@@ -90,21 +92,18 @@ export interface DluxLedStatus {
   dataOn: boolean;
   sceneOn: boolean;
   sceneUpdating: boolean;
-  scene: keyof typeof SceneType | "ERROR";
+  scene: SceneType;
   bufferSize: number;
-  colorType: keyof typeof ColorType | "ERROR";
+  colorType: ColorType;
 }
 
 const BIT = (b?: boolean) => (b ? 1 : 0);
 
 class InternalLedData {
   private readonly bytes: number[] = [];
-  private readonly scene: number;
   private colorType: number = 0;
 
-  constructor(scene: keyof typeof SceneType) {
-    this.scene = SceneType[scene];
-  }
+  constructor(private readonly scene: SceneType) {}
 
   public addByte = (value: number) => this.bytes.push(Math.min(Math.max(value, 0), 255));
 
@@ -164,15 +163,15 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
   const d = new InternalLedData(scene.type);
 
   switch (scene.type) {
-    case "STATIC": {
+    case SceneType.STATIC: {
       const o = scene as ISceneStatic<T>;
       d.addColor(o.color);
       break;
     }
 
-    case "PATTERN":
-    case "SWAP":
-    case "FLOW": {
+    case SceneType.PATTERN:
+    case SceneType.SWAP:
+    case SceneType.FLOW: {
       const o = scene as ISceneFlow<T>;
 
       o.colors.forEach(p => {
@@ -184,7 +183,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
       break;
     }
 
-    case "STROBE": {
+    case SceneType.STROBE: {
       const o = scene as ISceneStrobe<T>;
 
       d.addColor(o.color);
@@ -195,7 +194,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
       break;
     }
 
-    case "CHASE": {
+    case SceneType.CHASE: {
       const o = scene as ISceneChase<T>;
 
       d.addColor(o.color);
@@ -223,8 +222,8 @@ export const decode = (msg: string): DluxLedStatus => {
     dataOn: a[1] === "1",
     sceneOn: a[2] === "1",
     sceneUpdating: a[3] === "1",
-    scene: Number(a[4]) in SceneType ? (SceneType[Number(a[4])] as keyof typeof SceneType) : "ERROR",
+    scene: Number(a[4]) in SceneType ? Number(a[4]) as SceneType : SceneType.ERROR,
     bufferSize: Number(a[5]) || 0,
-    colorType: Number(a[6]) in ColorType ? (ColorType[Number(a[6])] as keyof typeof ColorType) : "ERROR",
+    colorType: Number(a[6]) in ColorType ? Number(a[6]) as ColorType : ColorType.ERROR,
   };
 };

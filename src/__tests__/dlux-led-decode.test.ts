@@ -1,4 +1,4 @@
-import { decode } from "../index";
+import { ColorType, decode, SceneType } from "../index";
 
 test("decode #1", () => {
   expect(decode("1:1:1:1:3:10:3")).toEqual({
@@ -6,9 +6,9 @@ test("decode #1", () => {
     dataOn: true,
     sceneOn: true,
     sceneUpdating: true,
-    scene: "SWAP",
+    scene: SceneType.SWAP,
     bufferSize: 10,
-    colorType: "RGB",
+    colorType: ColorType.RGB,
   });
 });
 
@@ -18,9 +18,9 @@ test("decode #2", () => {
     dataOn: true,
     sceneOn: true,
     sceneUpdating: false,
-    scene: "STROBE",
+    scene: SceneType.STROBE,
     bufferSize: 424242,
-    colorType: "Hue",
+    colorType: ColorType.Hue,
   });
 });
 
@@ -30,8 +30,8 @@ test("decode #3", () => {
     dataOn: false,
     sceneOn: false,
     sceneUpdating: false,
-    scene: "ERROR",
+    scene: SceneType.ERROR,
     bufferSize: -1,
-    colorType: "ERROR",
+    colorType: ColorType.ERROR,
   });
 });

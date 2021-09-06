@@ -1,8 +1,8 @@
-import { encode, Hue, HV, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, RGB, RGBW } from "../index";
+import { encode, Hue, HV, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, RGB, RGBW, SceneType } from "../index";
 
 test("encode non-supported scene type throw", () => {
   const o: ISceneStatic<HV> = {
-    type: "nothing" as "STATIC",
+    type: 1000 as SceneType.STATIC,
     color: [0x55, 0x01],
   };
 
@@ -11,7 +11,7 @@ test("encode non-supported scene type throw", () => {
 
 test("encode color type mismatch throw", () => {
   const o: IScenePattern<HV> = {
-    type: "PATTERN",
+    type: SceneType.PATTERN,
     colors: [[[0x55, 0x01], 1], [0x55, 1] as unknown as [HV, number]],
   };
 
@@ -24,7 +24,7 @@ test("off", () => {
 
 test("STATIC HV color", () => {
   const o: ISceneStatic<HV> = {
-    type: "STATIC",
+    type: SceneType.STATIC,
     color: [0x55, 0x01],
   };
 
@@ -36,7 +36,7 @@ test("STATIC HV color", () => {
 
 test("STATIC RGB color", () => {
   const o: ISceneStatic<RGB> = {
-    type: "STATIC",
+    type: SceneType.STATIC,
     color: [0x33, 0x44, 0x55],
   };
 
@@ -48,7 +48,7 @@ test("STATIC RGB color", () => {
 
 test("STATIC hue color", () => {
   const o: ISceneStatic<Hue> = {
-    type: "STATIC",
+    type: SceneType.STATIC,
     color: 0x42,
   };
 
@@ -60,7 +60,7 @@ test("STATIC hue color", () => {
 
 test("STATIC RGBW color", () => {
   const o: ISceneStatic<RGBW> = {
-    type: "STATIC",
+    type: SceneType.STATIC,
     color: [0x33, 0x44, 0x55, 0x66],
   };
 
@@ -72,15 +72,15 @@ test("STATIC RGBW color", () => {
 
 test("PATTERN/SWAP/FLOW HV color", () => {
   const o: IScenePattern<HV> = {
-    type: "PATTERN",
+    type: SceneType.PATTERN,
     colors: [
       [[0x01, 0x02], 5],
       [[0x02, 0x03], 2],
       [[0x10, 0x09], 3],
     ],
   };
-  const o2: ISceneSwap<HV> = { ...o, type: "SWAP" };
-  const o3: ISceneFlow<HV> = { ...o, type: "FLOW" };
+  const o2: ISceneSwap<HV> = { ...o, type: SceneType.SWAP };
+  const o3: ISceneFlow<HV> = { ...o, type: SceneType.FLOW };
 
   expect(encode(o)).toEqual({ scene: 2, data: Buffer.from([0x01, 0x02, 5, 0x02, 0x03, 2, 0x10, 0x09, 3]) });
   expect(encode(o2)).toEqual({ scene: 3, data: Buffer.from([0x01, 0x02, 5, 0x02, 0x03, 2, 0x10, 0x09, 3]) });
@@ -101,15 +101,15 @@ test("PATTERN/SWAP/FLOW HV color", () => {
 
 test("PATTERN/SWAP/FLOW RGB color", () => {
   const o: IScenePattern<RGB> = {
-    type: "PATTERN",
+    type: SceneType.PATTERN,
     colors: [
       [[0x01, 0x02, 0x03], 5],
       [[0x02, 0x03, 0x04], 2],
       [[0x10, 0x09, 0x08], 3],
     ],
   };
-  const o2: ISceneSwap<RGB> = { ...o, type: "SWAP" };
-  const o3: ISceneFlow<RGB> = { ...o, type: "FLOW" };
+  const o2: ISceneSwap<RGB> = { ...o, type: SceneType.SWAP };
+  const o3: ISceneFlow<RGB> = { ...o, type: SceneType.FLOW };
 
   expect(encode(o)).toEqual({ scene: 22, data: Buffer.from([0x01, 0x02, 0x03, 5, 0x02, 0x03, 0x04, 2, 0x10, 0x09, 0x08, 3]) });
   expect(encode(o2)).toEqual({ scene: 23, data: Buffer.from([0x01, 0x02, 0x03, 5, 0x02, 0x03, 0x04, 2, 0x10, 0x09, 0x08, 3]) });
@@ -130,15 +130,15 @@ test("PATTERN/SWAP/FLOW RGB color", () => {
 
 test("PATTERN/SWAP/FLOW hue color", () => {
   const o: IScenePattern<Hue> = {
-    type: "PATTERN",
+    type: SceneType.PATTERN,
     colors: [
       [0x01, 5],
       [0x02, 2],
       [0x03, 3],
     ],
   };
-  const o2: ISceneSwap<Hue> = { ...o, type: "SWAP" };
-  const o3: ISceneFlow<Hue> = { ...o, type: "FLOW" };
+  const o2: ISceneSwap<Hue> = { ...o, type: SceneType.SWAP };
+  const o3: ISceneFlow<Hue> = { ...o, type: SceneType.FLOW };
 
   expect(encode(o)).toEqual({ scene: 42, data: Buffer.from([0x01, 5, 0x02, 2, 0x03, 3]) });
   expect(encode(o2)).toEqual({ scene: 43, data: Buffer.from([0x01, 5, 0x02, 2, 0x03, 3]) });
@@ -159,15 +159,15 @@ test("PATTERN/SWAP/FLOW hue color", () => {
 
 test("PATTERN/SWAP/FLOW RGBW color", () => {
   const o: IScenePattern<RGBW> = {
-    type: "PATTERN",
+    type: SceneType.PATTERN,
     colors: [
       [[0x01, 0x02, 0x03, 0x20], 5],
       [[0x02, 0x03, 0x04, 0x21], 2],
       [[0x10, 0x09, 0x08, 0x22], 3],
     ],
   };
-  const o2: ISceneSwap<RGBW> = { ...o, type: "SWAP" };
-  const o3: ISceneFlow<RGBW> = { ...o, type: "FLOW" };
+  const o2: ISceneSwap<RGBW> = { ...o, type: SceneType.SWAP };
+  const o3: ISceneFlow<RGBW> = { ...o, type: SceneType.FLOW };
 
   expect(encode(o)).toEqual({ scene: 62, data: Buffer.from([0x01, 0x02, 0x03, 0x20, 5, 0x02, 0x03, 0x04, 0x21, 2, 0x10, 0x09, 0x08, 0x22, 3]) });
   expect(encode(o2)).toEqual({ scene: 63, data: Buffer.from([0x01, 0x02, 0x03, 0x20, 5, 0x02, 0x03, 0x04, 0x21, 2, 0x10, 0x09, 0x08, 0x22, 3]) });
@@ -188,7 +188,7 @@ test("PATTERN/SWAP/FLOW RGBW color", () => {
 
 test("STROBE HV color", () => {
   const o: ISceneStrobe<HV> = {
-    type: "STROBE",
+    type: SceneType.STROBE,
     color: [0x01, 0x02],
     color2: [0x02, 0x03],
     time: 2,
@@ -205,7 +205,7 @@ test("STROBE HV color", () => {
 
 test("STROBE RGB color", () => {
   const o: ISceneStrobe<RGB> = {
-    type: "STROBE",
+    type: SceneType.STROBE,
     color: [0x01, 0x02, 0x03],
     color2: [0x02, 0x03, 0x04],
     time: 2,
@@ -218,7 +218,7 @@ test("STROBE RGB color", () => {
 
 test("STROBE hue color", () => {
   const o: ISceneStrobe<Hue> = {
-    type: "STROBE",
+    type: SceneType.STROBE,
     color: 0x01,
     color2: 0x02,
     time: 2,
@@ -231,7 +231,7 @@ test("STROBE hue color", () => {
 
 test("STROBE RGBW color", () => {
   const o: ISceneStrobe<RGBW> = {
-    type: "STROBE",
+    type: SceneType.STROBE,
     color: [0x01, 0x02, 0x03, 0x20],
     color2: [0x02, 0x03, 0x04, 0x21],
     time: 2,
@@ -244,7 +244,7 @@ test("STROBE RGBW color", () => {
 
 test("CHASE HV color", () => {
   const o: ISceneChase<HV> = {
-    type: "CHASE",
+    type: SceneType.CHASE,
     color: [0x01, 0x02],
     color2: [0x02, 0x03],
     time: 10,
@@ -275,7 +275,7 @@ test("CHASE HV color", () => {
 
 test("CHASE RGB color", () => {
   const o: ISceneChase<RGB> = {
-    type: "CHASE",
+    type: SceneType.CHASE,
     color: [0x01, 0x02, 0x03],
     color2: [0x02, 0x03, 0x04],
     time: 10,
@@ -290,7 +290,7 @@ test("CHASE RGB color", () => {
 
 test("CHASE hue color", () => {
   const o: ISceneChase<Hue> = {
-    type: "CHASE",
+    type: SceneType.CHASE,
     color: 0x01,
     color2: 0x02,
     time: 10,
@@ -305,7 +305,7 @@ test("CHASE hue color", () => {
 
 test("CHASE RGBW color", () => {
   const o: ISceneChase<RGBW> = {
-    type: "CHASE",
+    type: SceneType.CHASE,
     color: [0x01, 0x02, 0x03, 0x20],
     color2: [0x02, 0x03, 0x04, 0x21],
     time: 10,
