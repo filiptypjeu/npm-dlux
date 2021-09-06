@@ -82,11 +82,6 @@ export interface ISceneChase<T extends Color> extends IScene<T> {
   comet?: boolean;
 }
 
-export interface DluxLed {
-  scene: number;
-  data: Buffer;
-}
-
 export interface DluxLedStatus {
   scene: SceneType;
   colorType: ColorType;
@@ -101,7 +96,7 @@ const BIT = (b?: boolean) => (b ? 1 : 0);
 
 class InternalLedData {
   private readonly bytes: number[] = [];
-  private colorType: number = 0;
+  private colorSize: number = 0;
 
   constructor(private readonly scene: SceneType) {}
 
@@ -110,54 +105,23 @@ class InternalLedData {
   public addColor = (color: Color) => {
     const array = Array.isArray(color) ? color : [color];
 
-    if (!this.colorType) {
-      this.colorType = array.length;
-    } else if (this.colorType !== array.length) {
+    // This only works because the different color types have different amount of components (dlux also uses this fact internally)
+    if (!this.colorSize) {
+      this.colorSize = array.length;
+    } else if (this.colorSize !== array.length) {
       throw new Error("Color type mismatch");
     }
 
     array.forEach(c => this.addByte(c));
   };
 
-  public build = (): DluxLed => {
-    let s = this.scene;
-    switch (this.colorType) {
-      case 0:
-        if (this.bytes.length) {
-          throw new Error("No color added");
-        }
-        break;
-
-      case 1:
-        s += 40;
-        break;
-
-      case 3:
-        s += 20;
-        break;
-
-      case 4:
-        s += 60;
-        break;
-
-      default:
-        break;
-    }
-
-    return {
-      scene: s,
-      data: Buffer.from(this.bytes),
-    };
-  };
+  public build = (): Buffer => Buffer.from([this.scene, this.colorSize].concat(this.bytes));
 }
 
-export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
+export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
   // OFF
   if (!scene) {
-    return {
-      scene: 0,
-      data: Buffer.from(""),
-    };
+    return Buffer.from("");
   }
 
   const d = new InternalLedData(scene.type);
