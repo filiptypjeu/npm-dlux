@@ -1,7 +1,7 @@
-import { ColorType, decode, SceneType } from "../index";
+import { ColorType, status, SceneType } from "../index";
 
-test("decode #1", () => {
-  expect(decode("3:3:10:1:1:1:1")).toEqual({
+test("status #1", () => {
+  expect(status("3:3:10:1:1:1:1")).toEqual({
     scene: SceneType.SWAP,
     colorType: ColorType.RGB,
     bufferSize: 10,
@@ -12,8 +12,8 @@ test("decode #1", () => {
   });
 });
 
-test("decode #2", () => {
-  expect(decode("5:1:424242:0:1:1:0")).toEqual({
+test("status #2", () => {
+  expect(status("5:1:424242:0:1:1:0")).toEqual({
     scene: SceneType.STROBE,
     colorType: ColorType.Hue,
     bufferSize: 424242,
@@ -24,8 +24,8 @@ test("decode #2", () => {
   });
 });
 
-test("decode #3", () => {
-  expect(decode("7:5:-1:no:true:10:-1")).toEqual({
+test("status #3", () => {
+  expect(status("7:5:-1:no:true:10:-1")).toEqual({
     scene: SceneType.ERROR,
     colorType: ColorType.ERROR,
     bufferSize: -1,

@@ -179,7 +179,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
   return d.build();
 };
 
-export const decode = (msg: string): DluxLedStatus => {
+export const status = (msg: string): DluxLedStatus => {
   const a = msg.trim().split(":");
   return {
     scene: Number(a[0]) in SceneType ? Number(a[0]) as SceneType : SceneType.ERROR,
