@@ -1,37 +1,37 @@
 import { ColorType, decode, SceneType } from "../index";
 
 test("decode #1", () => {
-  expect(decode("1:1:1:1:3:10:3")).toEqual({
+  expect(decode("3:3:10:1:1:1:1")).toEqual({
+    scene: SceneType.SWAP,
+    colorType: ColorType.RGB,
+    bufferSize: 10,
     powerOn: true,
     dataOn: true,
     sceneOn: true,
     sceneUpdating: true,
-    scene: SceneType.SWAP,
-    bufferSize: 10,
-    colorType: ColorType.RGB,
   });
 });
 
 test("decode #2", () => {
-  expect(decode("0:1:1:0:5:424242:1")).toEqual({
+  expect(decode("5:1:424242:0:1:1:0")).toEqual({
+    scene: SceneType.STROBE,
+    colorType: ColorType.Hue,
+    bufferSize: 424242,
     powerOn: false,
     dataOn: true,
     sceneOn: true,
     sceneUpdating: false,
-    scene: SceneType.STROBE,
-    bufferSize: 424242,
-    colorType: ColorType.Hue,
   });
 });
 
 test("decode #3", () => {
-  expect(decode("no:true:10:-1:7:-1:5")).toEqual({
+  expect(decode("7:5:-1:no:true:10:-1")).toEqual({
+    scene: SceneType.ERROR,
+    colorType: ColorType.ERROR,
+    bufferSize: -1,
     powerOn: false,
     dataOn: false,
     sceneOn: false,
     sceneUpdating: false,
-    scene: SceneType.ERROR,
-    bufferSize: -1,
-    colorType: ColorType.ERROR,
   });
 });

@@ -88,13 +88,13 @@ export interface DluxLed {
 }
 
 export interface DluxLedStatus {
+  scene: SceneType;
+  colorType: ColorType;
+  bufferSize: number;
   powerOn: boolean;
   dataOn: boolean;
   sceneOn: boolean;
   sceneUpdating: boolean;
-  scene: SceneType;
-  bufferSize: number;
-  colorType: ColorType;
 }
 
 const BIT = (b?: boolean) => (b ? 1 : 0);
@@ -216,14 +216,14 @@ export const encode = <T extends Color>(scene?: IScene<T>): DluxLed => {
 };
 
 export const decode = (msg: string): DluxLedStatus => {
-  const a = msg.split(":");
+  const a = msg.trim().split(":");
   return {
-    powerOn: a[0] === "1",
-    dataOn: a[1] === "1",
-    sceneOn: a[2] === "1",
-    sceneUpdating: a[3] === "1",
-    scene: Number(a[4]) in SceneType ? Number(a[4]) as SceneType : SceneType.ERROR,
-    bufferSize: Number(a[5]) || 0,
-    colorType: Number(a[6]) in ColorType ? Number(a[6]) as ColorType : ColorType.ERROR,
+    scene: Number(a[0]) in SceneType ? Number(a[0]) as SceneType : SceneType.ERROR,
+    colorType: Number(a[1]) in ColorType ? Number(a[1]) as ColorType : ColorType.ERROR,
+    bufferSize: Number(a[2]) || 0,
+    powerOn: a[3] === "1",
+    dataOn: a[4] === "1",
+    sceneOn: a[5] === "1",
+    sceneUpdating: a[6] === "1",
   };
 };
