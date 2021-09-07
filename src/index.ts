@@ -118,6 +118,9 @@ class InternalLedData {
   public build = (): Buffer => Buffer.from([this.scene, this.colorSize].concat(this.bytes));
 }
 
+/**
+ * Encode a dlux LED scene into a Buffer to be able to send it to the device.
+ */
 export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
   // OFF
   if (!scene) {
@@ -179,6 +182,9 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
   return d.build();
 };
 
+/**
+ * Decode a dlux LED status string into a a human readable format.
+ */
 export const status = (msg: string): DluxLedStatus => {
   const a = msg.trim().split(":");
   return {
