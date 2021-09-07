@@ -230,7 +230,6 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
 //     default:
 //   }
 
-
 // }
 
 /**
