@@ -30,6 +30,7 @@ export type Swaps<T extends Color> = [T, MS100][];
 
 interface IScene<T extends Color> extends Object {
   type: SceneType;
+  // colorType?: ColorType;
   color?: T;
   color2?: T;
   colors?: ColorNumber<T>[];
@@ -181,6 +182,56 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
 
   return d.build();
 };
+
+/**
+ * Decode a dlux LED scene buffer into a human readable format.
+ */
+// export const decode = (buffer: Buffer): IScene<any> => {
+
+//   // Check scene type
+//   if (buffer.length === 0) {
+//     return { type: SceneType.OFF };
+//   }
+//   if (!(buffer[0] in SceneType)) {
+//     return { type: SceneType.ERROR };
+//   }
+//   const type = buffer[0] as SceneType;
+
+//   // Check color type/size
+//   let colorType = ColorType.RGB;
+//   if (buffer.length > 1) {
+//     if (!(buffer[1] in ColorType)) {
+//       return { type, colorType: ColorType.ERROR };
+//     }
+//     colorType = buffer[1];
+//   }
+
+//   const size = Math.max(0, buffer.length - 2);
+
+//   switch (type) {
+//     case SceneType.STATIC: {
+//       break;
+//     }
+
+//     case SceneType.PATTERN:
+//     case SceneType.SWAP:
+//     case SceneType.FLOW: {
+//       break;
+//     }
+
+//     case SceneType.STROBE: {
+//       break;
+//     }
+
+//     case SceneType.CHASE: {
+//       break;
+//     }
+
+//     default:
+//   }
+
+
+// }
 
 /**
  * Decode a dlux LED status string into a a human readable format.
