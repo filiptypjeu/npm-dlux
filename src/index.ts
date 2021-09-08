@@ -239,7 +239,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
  */
 export const status = (msg: string): DluxLedStatus => {
   const a = msg.trim().split(":");
-  const status: DluxLedStatus = {
+  const res: DluxLedStatus = {
     scene: Number(a[0]) in SceneType ? (Number(a[0]) as SceneType) : SceneType.ERROR,
     colorType: Number(a[1]) in ColorType ? (Number(a[1]) as ColorType) : ColorType.ERROR,
     bufferSize: Number(a[2]) || 0,
@@ -250,10 +250,10 @@ export const status = (msg: string): DluxLedStatus => {
   };
 
   // There is basically only a color if the scene is STATIC or OFF, otherwise it might be for example "x,x,x"
-  const color = (a[7] || "").split(",").map(s => s ? BYTE(Number(s)) : NaN);
+  const color = (a[7] || "").split(",").map(s => (s ? BYTE(Number(s)) : NaN));
   if (color.length && !color.includes(NaN)) {
-    status.color = color.concat([0,0,0,0]).slice(0, 4) as RGBW;
+    res.color = color.concat([0, 0, 0, 0]).slice(0, 4) as RGBW;
   }
 
-  return status;
+  return res;
 };

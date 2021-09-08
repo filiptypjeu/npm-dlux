@@ -9,7 +9,7 @@ test("status #1", () => {
     dataOn: true,
     sceneOn: true,
     sceneUpdating: true,
-    color: [123,0,255, 0],
+    color: [123, 0, 255, 0],
   });
 });
 
