@@ -1,7 +1,7 @@
 import { ColorType, status, SceneType } from "../index";
 
 test("status #1", () => {
-  expect(status("3:3:10:1:1:1:1")).toEqual({
+  expect(status("3:3:10:1:1:1:1:123,-1,1000")).toEqual({
     scene: SceneType.SWAP,
     colorType: ColorType.RGB,
     bufferSize: 10,
@@ -9,6 +9,7 @@ test("status #1", () => {
     dataOn: true,
     sceneOn: true,
     sceneUpdating: true,
+    color: [123,0,255, 0],
   });
 });
 
@@ -25,7 +26,7 @@ test("status #2", () => {
 });
 
 test("status #3", () => {
-  expect(status("7:5:-1:no:true:10:-1")).toEqual({
+  expect(status("7:5:-1:no:true:10:-1:100,150,200,")).toEqual({
     scene: SceneType.ERROR,
     colorType: ColorType.ERROR,
     bufferSize: -1,

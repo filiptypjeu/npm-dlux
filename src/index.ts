@@ -91,9 +91,11 @@ export interface DluxLedStatus {
   dataOn: boolean;
   sceneOn: boolean;
   sceneUpdating: boolean;
+  color?: RGBW;
 }
 
 const BIT = (b?: boolean) => (b ? 1 : 0);
+const BYTE = (b: number) => Math.min(Math.max(b, 0), 255);
 
 class InternalLedData {
   private readonly bytes: number[] = [];
@@ -101,7 +103,7 @@ class InternalLedData {
 
   constructor(private readonly scene: SceneType) {}
 
-  public addByte = (value: number) => this.bytes.push(Math.min(Math.max(value, 0), 255));
+  public addByte = (value: number) => this.bytes.push(BYTE(value));
 
   public addColor = (color: Color) => {
     const array = Array.isArray(color) ? color : [color];
@@ -237,7 +239,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
  */
 export const status = (msg: string): DluxLedStatus => {
   const a = msg.trim().split(":");
-  return {
+  const status: DluxLedStatus = {
     scene: Number(a[0]) in SceneType ? (Number(a[0]) as SceneType) : SceneType.ERROR,
     colorType: Number(a[1]) in ColorType ? (Number(a[1]) as ColorType) : ColorType.ERROR,
     bufferSize: Number(a[2]) || 0,
@@ -246,4 +248,12 @@ export const status = (msg: string): DluxLedStatus => {
     sceneOn: a[5] === "1",
     sceneUpdating: a[6] === "1",
   };
+
+  // There is basically only a color if the scene is STATIC or OFF, otherwise it might be for example "x,x,x"
+  const color = (a[7] || "").split(",").map(s => s ? BYTE(Number(s)) : NaN);
+  if (color.length && !color.includes(NaN)) {
+    status.color = color.concat([0,0,0,0]).slice(0, 4) as RGBW;
+  }
+
+  return status;
 };
