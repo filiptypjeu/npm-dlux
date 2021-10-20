@@ -1,3 +1,5 @@
+import { toMorse } from "./morse-dictionary";
+
 export type Hue = number;
 export type HV = [number, number];
 export type RGB = [number, number, number];
@@ -257,3 +259,57 @@ export const status = (msg: string): DluxLedStatus => {
 
   return res;
 };
+
+export interface IMorse<C extends Color> {
+  text: string;
+  onColor: C;
+  offColor: C;
+  dit?: number;
+}
+
+export const morse = <C extends Color>(text: string, onColor: C, offColor: C, dit100ms: MS100 = 2): Buffer => {
+  // Dit length must be between 1 and 36 (37*7 > 255)
+  const dit = Math.min(Math.max(1, dit100ms), 36);
+  const dah = dit*3;
+  const space = dit; // Space between dits and dahs
+  const letterSpace = dit*3; // Space between letters
+  const wordSpace = dit*7; // Space between words
+
+  const colors: Swaps<C> = [];
+
+  const words = text.toLowerCase().split(" ").filter(s => s);
+
+  // Loop through all words
+  words.forEach(word => {
+    const letters = [...word];
+
+    // Loop through all letters in the word
+    letters.forEach((letter, i) => {
+      const symbols = [...toMorse[letter]];
+
+      // Loop through all morse symbols of the letter
+      symbols.forEach((symbol, j) => {
+        colors.push([onColor, symbol === "." ? dit : dah]);
+
+        // If between symbols inside a letter
+        if (j + 1 < symbols.length) {
+          colors.push([offColor, space]);
+
+        // If between letters inside a word
+        } else if (i + 1 < letters.length) {
+          colors.push([offColor, letterSpace]);
+
+        // If between words
+        } else {
+          colors.push([offColor, wordSpace]);
+        }
+      });
+    });
+  });
+
+  const scene: ISceneSwap<C> = {
+    type: SceneType.SWAP,
+    colors,
+  };
+  return encode(scene);
+}
