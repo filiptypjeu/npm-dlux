@@ -1,5 +1,28 @@
 import { morse, SceneType } from "../index";
 
+test("morse a HV", () => {
+  expect(morse("a", [0, 255], [0, 0])).toEqual(
+    Buffer.from([
+      SceneType.SWAP,
+      2,
+      // A = ._
+      0,
+      255,
+      2, // .
+      0,
+      0,
+      2, // space
+      0,
+      255,
+      6, // -
+
+      0,
+      0,
+      14, // word space
+    ])
+  );
+});
+
 test("morse hello HV", () => {
   expect(morse("hello", [1, 1], [0, 0])).toEqual(
     Buffer.from([
