@@ -272,13 +272,25 @@ export interface IMorse<C extends Color> {
   dit?: number;
 }
 
-export const morse = <C extends Color>(text: string, onColor: C, offColor: C, dit100ms: MS100 = 2): Buffer => {
+/**
+ * Create a Buffer for showing morse code on a dlux LED device. All temporal lengths are in the unit 100ms.
+ *
+ * @param text The text to encode.
+ * @param onColor The color for the dits and dahs.
+ * @param offColor The color for all spaces.
+ * @param dit100ms The lenght of a dit, by default 200ms.
+ * @param dah100ms The length of a dah, by default 3*dit.
+ * @param symbolSpace The space between symbols in a letter, by default dit.
+ * @param letterSpace The space between letters in a word, by default 3*dit.
+ * @param wordSpace The space between words, by default 7*dit.
+ */
+export const morse = <C extends Color>(text: string, onColor: C, offColor: C, dit100ms: MS100 = 2, dah100ms?: MS100, symboldSpace100ms?: MS100, letterSpace100ms?: MS100, wordSpace100ms?: MS100): Buffer => {
   // Dit length must be between 1 and 36 (37*7 > 255)
   const dit = Math.min(Math.max(1, dit100ms), 36);
-  const dah = dit * 3;
-  const space = dit; // Space between dits and dahs
-  const letterSpace = dit * 3; // Space between letters
-  const wordSpace = dit * 7; // Space between words
+  const dah = dah100ms || dit * 3;
+  const space = symboldSpace100ms || dit; // Space between dits and dahs
+  const letterSpace = letterSpace100ms || dit * 3; // Space between letters
+  const wordSpace = wordSpace100ms || dit * 7; // Space between words
 
   const colors: Swaps<C> = [];
 

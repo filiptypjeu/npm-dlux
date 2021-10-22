@@ -1,24 +1,40 @@
 import { morse, SceneType } from "../index";
 
 test("morse a HV", () => {
-  expect(morse("a", [0, 255], [0, 0])).toEqual(
+  expect(morse("aa", [0, 255], [0, 0], 1, 2, 3, 4, 5)).toEqual(
     Buffer.from([
       SceneType.SWAP,
       2,
+
       // A = ._
       0,
       255,
-      2, // .
+      1, // .
       0,
       0,
-      2, // space
+      3, // space
       0,
       255,
-      6, // -
+      2, // -
 
       0,
       0,
-      14, // word space
+      4, // letter space
+
+      // A = ._
+      0,
+      255,
+      1, // .
+      0,
+      0,
+      3, // space
+      0,
+      255,
+      2, // -
+
+      0,
+      0,
+      5, // word space
     ])
   );
 });
@@ -28,6 +44,7 @@ test("morse hello HV", () => {
     Buffer.from([
       SceneType.SWAP,
       2,
+
       // H = ....
       1,
       1,
@@ -147,6 +164,7 @@ test("morse må$! RGBW", () => {
     Buffer.from([
       SceneType.SWAP,
       4,
+
       // M = --
       1,
       2,
