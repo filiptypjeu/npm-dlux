@@ -30,6 +30,13 @@ export type ColorNumber<T extends Color> = [T, number];
 export type Pattern<T extends Color> = [T, Leds][];
 export type Swaps<T extends Color> = [T, MS100][];
 
+export const BLACK = (color: Color): Color => {
+  if (!Array.isArray(color)) {
+    return 0;
+  }
+  return color.map(_ => 0) as Color;
+}
+
 interface IScene<T extends Color> extends Object {
   type: SceneType;
   // colorType?: ColorType;
