@@ -14,7 +14,7 @@ test("status #1", () => {
 });
 
 test("status #2", () => {
-  expect(status("5:1:424242:0:1:1:0")).toEqual({
+  expect(status("5:1:424242:true:1:1:0")).toEqual({
     scene: SceneType.STROBE,
     colorType: ColorType.Hue,
     bufferSize: 424242,
@@ -26,12 +26,10 @@ test("status #2", () => {
 });
 
 test("status #3", () => {
-  expect(status("7:5:-1:no:true:10:-1:100,150,200,")).toEqual({
+  expect(status("7:5:-1:-:-:10:-1:100,150,200,")).toEqual({
     scene: SceneType.ERROR,
     colorType: ColorType.ERROR,
     bufferSize: -1,
-    powerOn: false,
-    dataOn: false,
     sceneOn: false,
     sceneUpdating: false,
   });

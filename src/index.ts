@@ -89,8 +89,8 @@ export interface DluxLedStatus {
   scene: SceneType;
   colorType: ColorType;
   bufferSize: number;
-  powerOn: boolean;
-  dataOn: boolean;
+  powerOn?: boolean;
+  dataOn?: boolean;
   sceneOn: boolean;
   sceneUpdating: boolean;
   color?: RGBW;
@@ -245,11 +245,16 @@ export const status = (msg: string): DluxLedStatus => {
     scene: Number(a[0]) in SceneType ? (Number(a[0]) as SceneType) : SceneType.ERROR,
     colorType: Number(a[1]) in ColorType ? (Number(a[1]) as ColorType) : ColorType.ERROR,
     bufferSize: Number(a[2]) || 0,
-    powerOn: a[3] === "1",
-    dataOn: a[4] === "1",
     sceneOn: a[5] === "1",
     sceneUpdating: a[6] === "1",
   };
+
+  if (a[3] !== "-") {
+    res.powerOn = a[3] === "1";
+  }
+  if (a[4] !== "-") {
+    res.dataOn = a[4] === "1";
+  }
 
   // There is basically only a color if the scene is STATIC or OFF, otherwise it might be for example "x,x,x"
   const color = (a[7] || "").split(",").map(s => (s ? BYTE(Number(s)) : NaN));
