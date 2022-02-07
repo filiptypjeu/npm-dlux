@@ -27,7 +27,7 @@ test("status #2", () => {
 });
 
 test("status #3", () => {
-  expect(status("7:5:-1:-:-:10:-1:100,150,200,")).toEqual({
+  expect(status("8:5:-1:-:-:10:-1:100,150,200,")).toEqual({
     scene: SceneType.ERROR,
     colorType: ColorType.ERROR,
     bufferSize: -1,

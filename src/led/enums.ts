@@ -14,6 +14,7 @@ export enum SceneType {
   FLOW = 4,
   STROBE = 5,
   CHASE = 6,
+  STATIC_RANDOM = 7,
 }
 export enum LedAction {
   BLACKOUT = 0,

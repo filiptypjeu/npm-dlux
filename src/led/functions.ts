@@ -34,7 +34,7 @@ class InternalLedData {
     array.forEach(c => this.addByte(c));
   };
 
-  public build = (): Buffer => Buffer.from([this.scene, this.colorSize].concat(this.bytes));
+  public build = (): Buffer => Buffer.from([this.scene].concat(this.colorSize ? [this.colorSize] : []).concat(this.bytes));
 }
 
 /**
@@ -93,6 +93,8 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
       /* tslint:enable:no-bitwise */
       break;
     }
+
+    case SceneType.STATIC_RANDOM: break;
 
     default:
       throw new Error(`Unsupported scene "${scene.type}"`);

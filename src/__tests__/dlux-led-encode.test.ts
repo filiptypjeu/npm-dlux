@@ -1,6 +1,6 @@
 import { ColorType, SceneType, PredefinedColor } from "../led/enums";
 import { encode } from "../led/functions";
-import { ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap } from "../led/interfaces";
+import { IScene, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap } from "../led/interfaces";
 import { Hue, HV, RGB, RGBW } from "../led/types";
 
 test("encode non-supported scene type throw", () => {
@@ -74,6 +74,14 @@ test("STATIC predefined color", () => {
 
   o.color = 1000;
   expect(encode(o)).toEqual(Buffer.from([SceneType.STATIC, ColorType.RGBW, 255, 0, 0, 0]));
+});
+
+test("STATIC_RANDOM", () => {
+  const o: IScene<number> = {
+    type: SceneType.STATIC_RANDOM,
+  };
+
+  expect(encode(o)).toEqual(Buffer.from([SceneType.STATIC_RANDOM]));
 });
 
 test("STATIC RGBW color", () => {
