@@ -1,5 +1,5 @@
 import { toMorse } from "../morse-dictionary";
-import { ColorType, SceneType } from "./enums";
+import { ColorType, SceneType, PredefinedColor } from "./enums";
 import { DluxLedStatus, IScene, ISceneChase, ISceneFlow, ISceneStatic, ISceneStrobe, ISceneSwap } from "./interfaces";
 import { Color, MS100, RGBW, Swaps } from "./types";
 
@@ -22,7 +22,7 @@ class InternalLedData {
   public addByte = (value: number) => this.bytes.push(BYTE(value));
 
   public addColor = (color: Color) => {
-    const array = Array.isArray(color) ? color : [color];
+    const array = Array.isArray(color) ? color : color in PredefinedColor ? colorToRGBW(color) : [color];
 
     // This only works because the different color types have different amount of components (dlux also uses this fact internally)
     if (!this.colorSize) {
@@ -179,13 +179,6 @@ export const status = (msg: string): DluxLedStatus => {
   return res;
 };
 
-export interface IMorse<C extends Color> {
-  text: string;
-  onColor: C;
-  offColor: C;
-  dit?: number;
-}
-
 /**
  * Create a Buffer for showing morse code on a dlux LED device. All temporal lengths are in the unit 100ms.
  *
@@ -246,4 +239,29 @@ export const morse = <C extends Color>(text: string, onColor: C, offColor: C, di
     colors,
   };
   return encode(scene);
+};
+
+export const colorToRGBW = (color: PredefinedColor): RGBW => {
+  switch (color) {
+    case PredefinedColor.RED:
+      return [255, 0, 0, 0];
+    case PredefinedColor.GREEN:
+      return [0, 255, 0, 0];
+    case PredefinedColor.BLUE:
+      return [0, 0, 255, 0];
+    case PredefinedColor.YELLOW:
+      return [255, 255, 0, 0];
+    case PredefinedColor.CYAN:
+      return [0, 255, 255, 0];
+    case PredefinedColor.MAGENTA:
+      return [255, 0, 255, 0];
+    case PredefinedColor.WHITE:
+      return [255, 255, 255, 0];
+    case PredefinedColor.WARM_WHITE:
+      return [0, 0, 0, 255];
+    case PredefinedColor.BLACK:
+      return [0, 0, 0, 0];
+    case PredefinedColor.RANDOM:
+      return [1, 1, 1, 0].map(n => n ? Math.floor(Math.random() * 256) : 0) as RGBW;
+  }
 };

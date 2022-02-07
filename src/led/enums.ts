@@ -23,3 +23,15 @@ export enum LedAction {
   ROTATE = 4,
   STEP = 5,
 }
+export enum PredefinedColor {
+  RED = 1000,
+  GREEN,
+  BLUE,
+  YELLOW,
+  CYAN,
+  MAGENTA,
+  WHITE,
+  WARM_WHITE,
+  BLACK,
+  RANDOM,
+}
