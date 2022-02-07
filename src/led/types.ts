@@ -1,0 +1,12 @@
+export type Hue = number;
+export type HV = [number, number];
+export type RGB = [number, number, number];
+export type RGBW = [number, number, number, number];
+export type Color = Hue | HV | RGB | RGBW;
+export type MS = number;
+export type MS10 = number;
+export type MS100 = number;
+export type Leds = number;
+export type ColorNumber<T extends Color> = [T, number];
+export type Pattern<T extends Color> = [T, Leds][];
+export type Swaps<T extends Color> = [T, MS100][];
