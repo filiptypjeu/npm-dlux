@@ -296,4 +296,4 @@ export const statusToString = (status: DluxLedStatus): string => {
     default:
       return "ERROR";
   }
-}
+};
