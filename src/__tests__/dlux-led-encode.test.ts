@@ -1,4 +1,7 @@
-import { ColorType, encode, Hue, HV, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, RGB, RGBW, SceneType } from "../index";
+import { ColorType, SceneType } from "../led/enums";
+import { encode } from "../led/functions";
+import { ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap } from "../led/interfaces";
+import { Hue, HV, RGB, RGBW } from "../led/types";
 
 test("encode non-supported scene type throw", () => {
   const o: ISceneStatic<HV> = {

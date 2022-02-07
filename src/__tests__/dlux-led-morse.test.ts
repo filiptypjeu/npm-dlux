@@ -1,4 +1,5 @@
-import { morse, SceneType } from "../index";
+import { morse } from "../led/functions";
+import { SceneType } from "../led/enums";
 
 test("morse a HV", () => {
   expect(morse("aa", [0, 255], [0, 0], 1, 2, 3, 4, 5)).toEqual(
