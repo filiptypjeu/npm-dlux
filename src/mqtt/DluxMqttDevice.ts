@@ -122,37 +122,41 @@ export class DluxMqttDevice {
   /**
    * Add listeners for all subscriptions of this implementation.
    */
-  public addListeners(): void {
+  public addListeners(): this {
     this.subscriptions.forEach(s =>
       this.client.addListener("message", (t: string, p: Buffer) => {
         if (t === s.topic) s.callback(p);
       })
     );
+    return this;
   }
 
   /**
    * Subsctibe to all subscription topics of this implementation.
    */
-  public subscribe(): void {
+  public subscribe(): this {
     this.subscriptions.forEach(s => this.client.subscribe(s.topic));
+    return this;
   }
 
   /**
    * Request states from the device.
    */
-  public requestStates(): void {
+  public requestStates(): this {
     this.client.publish(this.topic, "s"); // States
     this.client.publish(this.topic, "g"); // GPIO inputs and outputs
+    return this;
   }
 
   /**
    * Initialize this implementation fully (set client, add listeners, subscribe and request states).
    */
-  public initialize(client: MqttClient): void {
+  public initialize(client: MqttClient): this {
     this.client = client;
     this.addListeners();
     this.subscribe();
     this.requestStates();
+    return this;
   }
 
   private stringToBool(str: string): boolean | undefined {

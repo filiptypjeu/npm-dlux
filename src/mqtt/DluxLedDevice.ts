@@ -14,7 +14,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     sceneUpdating: false,
   };
 
-  constructor(name: string, topic: string, client?: MqttClient) {
+  constructor(name: string, topic: string, public readonly rgbw: boolean = true, client?: MqttClient) {
     super(name, topic, client);
   }
 
