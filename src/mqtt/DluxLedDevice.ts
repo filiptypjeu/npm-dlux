@@ -66,7 +66,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     const c: [Color, number][] = colors.map(c => [c, time]);
     const scene: ISceneFlow<Color> = {
       type: SceneType.FLOW,
-      colors: c.concat(colors.length === 1 ? [BLACK(colors[0]), time] : [])
+      colors: c.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
     };
     this.send(scene);
   }
@@ -76,6 +76,6 @@ export class DluxLedDevice extends DluxMqttDevice {
   }
 
   public action(a: LedAction): void {
-      this.client.publish(this.actionTopic, Buffer.from([a]));
+    this.client.publish(this.actionTopic, Buffer.from([a]));
   }
 }

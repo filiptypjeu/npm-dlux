@@ -8,7 +8,7 @@ export const BLACK = (color: Color): Color => {
     return 0;
   }
   return color.map(() => 0) as Color;
-}
+};
 
 const BIT = (b?: boolean) => (b ? 1 : 0);
 const BYTE = (b: number) => Math.min(Math.max(b, 0), 255);
@@ -191,7 +191,16 @@ export const status = (msg: string): DluxLedStatus => {
  * @param letterSpace The space between letters in a word, by default 3*dit.
  * @param wordSpace The space between words, by default 7*dit.
  */
-export const morse = <C extends Color>(text: string, onColor: C, offColor: C, dit100ms: MS100 = 2, dah100ms?: MS100, symboldSpace100ms?: MS100, letterSpace100ms?: MS100, wordSpace100ms?: MS100): Buffer => {
+export const morse = <C extends Color>(
+  text: string,
+  onColor: C,
+  offColor: C,
+  dit100ms: MS100 = 2,
+  dah100ms?: MS100,
+  symboldSpace100ms?: MS100,
+  letterSpace100ms?: MS100,
+  wordSpace100ms?: MS100
+): Buffer => {
   // Dit length must be between 1 and 36 (37*7 > 255)
   const dit = Math.min(Math.max(1, dit100ms), 36);
   const dah = dah100ms || dit * 3;
@@ -262,6 +271,6 @@ export const colorToRGBW = (color: PredefinedColor): RGBW => {
     case PredefinedColor.BLACK:
       return [0, 0, 0, 0];
     case PredefinedColor.RANDOM:
-      return [1, 1, 1, 0].map(n => n ? Math.floor(Math.random() * 256) : 0) as RGBW;
+      return [1, 1, 1, 0].map(n => (n ? Math.floor(Math.random() * 256) : 0)) as RGBW;
   }
 };
