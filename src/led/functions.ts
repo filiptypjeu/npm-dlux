@@ -94,7 +94,8 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
       break;
     }
 
-    case SceneType.STATIC_RANDOM: break;
+    case SceneType.STATIC_RANDOM:
+      break;
 
     default:
       throw new Error(`Unsupported scene "${scene.type}"`);
