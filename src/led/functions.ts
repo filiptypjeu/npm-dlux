@@ -1,4 +1,4 @@
-import { toMorse } from "../morse-dictionary";
+import { toMorse } from "./morse-dictionary";
 import { ColorType, SceneType, PredefinedColor } from "./enums";
 import { DluxLedStatus, IScene, ISceneChase, ISceneFlow, ISceneStatic, ISceneStrobe, ISceneSwap } from "./interfaces";
 import { Color, MS100, RGBW, Swaps } from "./types";
