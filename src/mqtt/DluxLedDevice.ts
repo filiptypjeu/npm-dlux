@@ -1,7 +1,7 @@
 import { MqttClient } from "mqtt";
 import { status, BLACK, encode, morse } from "../led/functions";
 import { DluxMqttDevice, IDluxSubscription } from "./DluxMqttDevice";
-import { ColorType, SceneType } from "../led/enums";
+import { ColorType, SceneType, LedAction } from "../led/enums";
 import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic } from "../led/interfaces";
 import { Color } from "../led/types";
 
@@ -75,7 +75,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     this.client.publish(this.sceneTopic, morse(text, color, color2));
   }
 
-  public action(): void {
-      
+  public action(a: LedAction): void {
+      this.client.publish(this.actionTopic, Buffer.from([a]));
   }
 }
