@@ -1,9 +1,9 @@
 import { MqttClient } from "mqtt";
-import { status, BLACK, encode, morse } from "../led/functions";
+import { status, BLACK, encode, morse, statusToString } from "../led/functions";
 import { DluxMqttDevice, IDluxSubscription } from "./DluxMqttDevice";
 import { ColorType, SceneType, LedAction } from "../led/enums";
-import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic } from "../led/interfaces";
-import { Color } from "../led/types";
+import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
+import { Color, MS100, Swaps } from "../led/types";
 
 export class DluxLedDevice extends DluxMqttDevice {
   private m_state: DluxLedStatus = {
@@ -53,6 +53,10 @@ export class DluxLedDevice extends DluxMqttDevice {
     ];
   }
 
+  public override toString(): string {
+    return `${this.name} = ${statusToString(this.state)}`;
+  }
+
   public send<C extends Color>(scene: IScene<C>): void {
     this.client.publish(this.sceneTopic, encode(scene));
   }
@@ -62,11 +66,20 @@ export class DluxLedDevice extends DluxMqttDevice {
     this.send(scene);
   }
 
-  public fade(colors: Color[], time: number): void {
-    const c: [Color, number][] = colors.map(c => [c, time]);
+  public swap(colors: Color[], time: MS100): void {
+    const swaps: Swaps<Color> = colors.map(c => [c, time]);
+    const scene: ISceneSwap<Color> = {
+      type: SceneType.SWAP,
+      colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
+    };
+    this.send(scene);
+  }
+
+  public flow(colors: Color[], time: MS100): void {
+    const swaps: Swaps<Color> = colors.map(c => [c, time]);
     const scene: ISceneFlow<Color> = {
       type: SceneType.FLOW,
-      colors: c.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
+      colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
     };
     this.send(scene);
   }

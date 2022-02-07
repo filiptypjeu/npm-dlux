@@ -277,3 +277,23 @@ export const colorToRGBW = (color: PredefinedColor): RGBW => {
       return [1, 1, 1, 0].map(n => (n ? Math.floor(Math.random() * 256) : 0)) as RGBW;
   }
 };
+
+export const statusToString = (status: DluxLedStatus): string => {
+  if (status.color) {
+    return status.color.toString();
+  }
+  switch (status.scene) {
+    case SceneType.SWAP:
+      return "SWAP";
+    case SceneType.FLOW:
+      return "FLOW";
+    case SceneType.STROBE:
+      return "STROBE";
+    case SceneType.CHASE:
+      return "CHASE";
+    case SceneType.PATTERN:
+      return "PATTERN";
+    default:
+      return "ERROR";
+  }
+}
