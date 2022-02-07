@@ -7,7 +7,7 @@ export const BLACK = (color: Color): Color => {
   if (!Array.isArray(color)) {
     return 0;
   }
-  return color.map(_ => 0) as Color;
+  return color.map(() => 0) as Color;
 }
 
 const BIT = (b?: boolean) => (b ? 1 : 0);

@@ -1,4 +1,4 @@
-import { IPublishPacket, MqttClient } from "mqtt";
+import { MqttClient } from "mqtt";
 
 // export type DluxInput = number | boolean | undefined;
 // export type DluxOutput = boolean | undefined;
@@ -124,7 +124,7 @@ export class DluxMqttDevice {
    */
   public addListeners(): void {
     this.subscriptions.forEach(s =>
-      this.client.addListener("message", (t: string, p: Buffer, _packet: IPublishPacket) => {
+      this.client.addListener("message", (t: string, p: Buffer) => {
         if (t === s.topic) s.callback(p);
       })
     );
