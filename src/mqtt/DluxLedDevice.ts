@@ -54,6 +54,13 @@ export class DluxLedDevice extends DluxMqttDevice {
     ];
   }
 
+  private isBufferUpToDate(): boolean {
+    // Check if the last sent buffer
+    return this.state.scene === this.m_buffer[0]
+      && this.state.colorType === this.m_buffer[1]
+      && this.state.bufferSize === Math.max(0, this.m_buffer.length - 2);
+  }
+
   public override toString(): string {
     return `${this.name} = ${statusToString(this.state)}`;
   }
@@ -92,5 +99,18 @@ export class DluxLedDevice extends DluxMqttDevice {
 
   public action(a: DluxLedAction): void {
     this._publish(this.actionTopic, a.toString());
+  }
+
+  public copyTo(device: DluxLedDevice): void {
+    // Static information is easy to copy
+    if (this.state.scene === DluxSceneType.STATIC) {
+      device.static(this.state.color!);
+      return;
+    }
+
+    if (this.isBufferUpToDate()) {
+      device.scene(this.m_buffer);
+      return;
+    }
   }
 }
