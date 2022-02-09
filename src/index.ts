@@ -4,3 +4,4 @@ export * from "./led/interfaces";
 export * from "./led/types";
 export * from "./mqtt/DluxMqttDevice";
 export * from "./mqtt/DluxLedDevice";
+export * from "./mqtt/DluxLedMultiDevice";
