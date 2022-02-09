@@ -1,5 +1,5 @@
 import { MqttClient } from "mqtt";
-import { status, BLACK, encode, morse, statusToString } from "../led/functions";
+import { status, encode, morse, statusToString } from "../led/functions";
 import { DluxMqttDevice, IDluxSubscription } from "./DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "../led/enums";
 import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
@@ -72,7 +72,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     const swaps: Swaps<Color> = colors.map(c => [c, time]);
     const scene: ISceneSwap<Color> = {
       type: DluxSceneType.SWAP,
-      colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
+      colors: swaps,
     };
     this.scene(scene);
   }
@@ -81,7 +81,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     const swaps: Swaps<Color> = colors.map(c => [c, time]);
     const scene: ISceneFlow<Color> = {
       type: DluxSceneType.FLOW,
-      colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
+      colors: swaps,
     };
     this.scene(scene);
   }
