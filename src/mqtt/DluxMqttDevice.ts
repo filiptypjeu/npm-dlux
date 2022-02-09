@@ -9,17 +9,21 @@ export interface IDluxSubscription {
 }
 
 export class DluxMqttDevice {
-  private m_topic: string;
+  private readonly m_topic: string;
+  private m_client: MqttClient | undefined;
 
   protected m_status: string = "offline";
   protected m_version: string = "";
-  protected m_client: MqttClient | undefined;
   protected m_inputs: string = ":::::::";
   protected m_outputs: string = "--------";
 
   constructor(public readonly name: string, topic?: string, client?: MqttClient) {
     this.m_topic = topic || "";
     if (client) this.initialize(client);
+  }
+
+  protected _publish(topic: string, buffer: Buffer | string) {
+    this.client.publish(topic, buffer);
   }
 
   /**
@@ -159,8 +163,8 @@ export class DluxMqttDevice {
    * Request states from the device.
    */
   public requestStates(): this {
-    this.client.publish(this.topic, "s"); // States
-    this.client.publish(this.topic, "g"); // GPIO inputs and outputs
+    this._publish(this.topic, "s"); // States
+    this._publish(this.topic, "g"); // GPIO inputs and outputs
     return this;
   }
 

@@ -85,10 +85,10 @@ export class DluxLedDevice extends DluxMqttDevice {
   }
 
   public morse(text: string, color: Color, color2: Color): void {
-    this.client.publish(this.sceneTopic, morse(text, color, color2));
+    this._publish(this.sceneTopic, morse(text, color, color2));
   }
 
   public action(a: DluxLedAction): void {
-    this.client.publish(this.actionTopic, Buffer.from([a]));
+    this._publish(this.actionTopic, a.toString());
   }
 }
