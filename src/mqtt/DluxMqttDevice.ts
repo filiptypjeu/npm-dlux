@@ -175,25 +175,25 @@ export class DluxMqttDevice {
     return this;
   }
 
-  private stringToBool(str: string): boolean | undefined {
+  private static stringToBool(str: string): boolean | undefined {
     return str === "1" ? true : str === "0" ? false : undefined;
   }
 
-  private stringToValue(str: string): number | boolean | undefined {
-    return str.length === 3 ? Number(str) : this.stringToBool(str);
+  private static stringToValue(str: string): number | boolean | undefined {
+    return str.length === 3 ? Number(str) : DluxMqttDevice.stringToBool(str);
   }
 
   /**
    * Get the input states of the device.
    */
   public get inputs(): (number | boolean | undefined)[] {
-    return this.m_inputs.split(":").map(str => this.stringToValue(str));
+    return this.m_inputs.split(":").map(str => DluxMqttDevice.stringToValue(str));
   }
 
   /**
    * Get the output states of the device.
    */
   public get outputs(): (boolean | undefined)[] {
-    return this.m_outputs.split("").map(str => this.stringToBool(str));
+    return this.m_outputs.split("").map(str => DluxMqttDevice.stringToBool(str));
   }
 }
