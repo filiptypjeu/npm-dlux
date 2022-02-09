@@ -62,7 +62,7 @@ export class DluxLedDevice extends DluxMqttDevice {
   }
 
   public override toString(): string {
-    return `${this.name} = ${statusToString(this.state)}`;
+    return statusToString(this.state);
   }
 
   public scene<C extends Color>(scene: IScene<C> | Buffer): void {

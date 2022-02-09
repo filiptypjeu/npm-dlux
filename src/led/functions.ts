@@ -280,7 +280,7 @@ export const colorToRGBW = (color: DluxPredefinedColor): RGBW => {
 
 export const statusToString = (status: DluxLedStatus): string => {
   if (status.color) {
-    return status.color.toString();
+    return `[${status.color.join(", ")}]`;
   }
   switch (status.scene) {
     case DluxSceneType.SWAP:
