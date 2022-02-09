@@ -9,13 +9,16 @@ export interface IDluxSubscription {
 }
 
 export class DluxMqttDevice {
+  private m_topic: string;
+
   protected m_status: string = "offline";
   protected m_version: string = "";
   protected m_client: MqttClient | undefined;
   protected m_inputs: string = ":::::::";
   protected m_outputs: string = "--------";
 
-  constructor(public readonly name: string, public readonly topic: string, client?: MqttClient) {
+  constructor(public readonly name: string, topic?: string, client?: MqttClient) {
+    this.m_topic = topic || "";
     if (client) this.initialize(client);
   }
 
@@ -30,6 +33,15 @@ export class DluxMqttDevice {
    */
   public get version(): string {
     return this.m_version;
+  }
+  /**
+   * Get the device topic.
+   */
+  public get topic(): string {
+    if (!this.m_topic) {
+      throw new Error(`DluxMqttDevice "${this.name}" does not have a topic"`);
+    }
+    return this.m_topic;
   }
   /**
    * Get the topic in which the device publishes its status.
@@ -63,6 +75,10 @@ export class DluxMqttDevice {
   }
 
   protected get commonSubscriptions(): IDluxSubscription[] {
+    if (!this.m_topic) {
+      return [];
+    }
+
     return [
       {
         topic: this.statusTopic,
