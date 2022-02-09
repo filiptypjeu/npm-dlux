@@ -1,10 +1,10 @@
 import { status } from "../led/functions";
-import { ColorType, SceneType } from "../led/enums";
+import { DluxColorType, DluxSceneType } from "../led/enums";
 
 test("status #1", () => {
   expect(status("3:3:10:1:1:1:1:123,-1,1000")).toEqual({
-    scene: SceneType.SWAP,
-    colorType: ColorType.RGB,
+    scene: DluxSceneType.SWAP,
+    colorType: DluxColorType.RGB,
     bufferSize: 10,
     powerOn: true,
     dataOn: true,
@@ -16,8 +16,8 @@ test("status #1", () => {
 
 test("status #2", () => {
   expect(status("5:1:424242:true:1:1:0")).toEqual({
-    scene: SceneType.STROBE,
-    colorType: ColorType.Hue,
+    scene: DluxSceneType.STROBE,
+    colorType: DluxColorType.Hue,
     bufferSize: 424242,
     powerOn: false,
     dataOn: true,
@@ -28,8 +28,8 @@ test("status #2", () => {
 
 test("status #3", () => {
   expect(status("8:5:-1:-:-:10:-1:100,150,200,")).toEqual({
-    scene: SceneType.ERROR,
-    colorType: ColorType.ERROR,
+    scene: DluxSceneType.ERROR,
+    colorType: DluxColorType.ERROR,
     bufferSize: -1,
     sceneOn: false,
     sceneUpdating: false,

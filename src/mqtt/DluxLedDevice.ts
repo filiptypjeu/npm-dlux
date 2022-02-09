@@ -1,14 +1,14 @@
 import { MqttClient } from "mqtt";
 import { status, BLACK, encode, morse, statusToString } from "../led/functions";
 import { DluxMqttDevice, IDluxSubscription } from "./DluxMqttDevice";
-import { ColorType, SceneType, LedAction } from "../led/enums";
+import { DluxColorType, DluxSceneType, DluxLedAction } from "../led/enums";
 import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
 import { Color, MS100, Swaps } from "../led/types";
 
 export class DluxLedDevice extends DluxMqttDevice {
   private m_state: DluxLedStatus = {
-    scene: SceneType.ERROR,
-    colorType: ColorType.ERROR,
+    scene: DluxSceneType.ERROR,
+    colorType: DluxColorType.ERROR,
     bufferSize: 0,
     sceneOn: false,
     sceneUpdating: false,
@@ -62,14 +62,14 @@ export class DluxLedDevice extends DluxMqttDevice {
   }
 
   public static(color: Color): void {
-    const scene: ISceneStatic<Color> = { type: SceneType.STATIC, color };
+    const scene: ISceneStatic<Color> = { type: DluxSceneType.STATIC, color };
     this.send(scene);
   }
 
   public swap(colors: Color[], time: MS100): void {
     const swaps: Swaps<Color> = colors.map(c => [c, time]);
     const scene: ISceneSwap<Color> = {
-      type: SceneType.SWAP,
+      type: DluxSceneType.SWAP,
       colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
     };
     this.send(scene);
@@ -78,7 +78,7 @@ export class DluxLedDevice extends DluxMqttDevice {
   public flow(colors: Color[], time: MS100): void {
     const swaps: Swaps<Color> = colors.map(c => [c, time]);
     const scene: ISceneFlow<Color> = {
-      type: SceneType.FLOW,
+      type: DluxSceneType.FLOW,
       colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
     };
     this.send(scene);
@@ -88,7 +88,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     this.client.publish(this.sceneTopic, morse(text, color, color2));
   }
 
-  public action(a: LedAction): void {
+  public action(a: DluxLedAction): void {
     this.client.publish(this.actionTopic, Buffer.from([a]));
   }
 }

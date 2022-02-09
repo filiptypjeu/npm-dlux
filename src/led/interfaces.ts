@@ -1,8 +1,8 @@
-import { ColorType, SceneType } from "./enums";
+import { DluxColorType, DluxSceneType } from "./enums";
 import { Color, ColorNumber, Leds, MS, MS10, Pattern, RGBW, Swaps } from "./types";
 
 export interface IScene<T extends Color> extends Object {
-  type: SceneType;
+  type: DluxSceneType;
   // colorType?: ColorType;
   color?: T;
   color2?: T;
@@ -17,27 +17,27 @@ export interface IScene<T extends Color> extends Object {
 }
 
 export interface ISceneStatic<T extends Color> extends IScene<T> {
-  type: SceneType.STATIC;
+  type: DluxSceneType.STATIC;
   color: T;
 }
 
 export interface IScenePattern<T extends Color> extends IScene<T> {
-  type: SceneType.PATTERN;
+  type: DluxSceneType.PATTERN;
   colors: Pattern<T>;
 }
 
 export interface ISceneSwap<T extends Color> extends IScene<T> {
-  type: SceneType.SWAP;
+  type: DluxSceneType.SWAP;
   colors: Swaps<T>;
 }
 
 export interface ISceneFlow<T extends Color> extends IScene<T> {
-  type: SceneType.FLOW;
+  type: DluxSceneType.FLOW;
   colors: Swaps<T>;
 }
 
 export interface ISceneStrobe<T extends Color> extends IScene<T> {
-  type: SceneType.STROBE;
+  type: DluxSceneType.STROBE;
   color: T;
   color2: T;
   time: MS;
@@ -46,7 +46,7 @@ export interface ISceneStrobe<T extends Color> extends IScene<T> {
 }
 
 export interface ISceneChase<T extends Color> extends IScene<T> {
-  type: SceneType.CHASE;
+  type: DluxSceneType.CHASE;
   color: T;
   color2: T;
   time: MS10;
@@ -57,8 +57,8 @@ export interface ISceneChase<T extends Color> extends IScene<T> {
 }
 
 export interface DluxLedStatus {
-  scene: SceneType;
-  colorType: ColorType;
+  scene: DluxSceneType;
+  colorType: DluxColorType;
   bufferSize: number;
   powerOn?: boolean;
   dataOn?: boolean;

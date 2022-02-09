@@ -1,5 +1,5 @@
 import { toMorse } from "./morse-dictionary";
-import { ColorType, SceneType, PredefinedColor } from "./enums";
+import { DluxColorType, DluxSceneType, DluxPredefinedColor } from "./enums";
 import { DluxLedStatus, IScene, ISceneChase, ISceneFlow, ISceneStatic, ISceneStrobe, ISceneSwap } from "./interfaces";
 import { Color, MS100, RGBW, Swaps } from "./types";
 
@@ -17,12 +17,12 @@ class InternalLedData {
   private readonly bytes: number[] = [];
   private colorSize: number = 0;
 
-  constructor(private readonly scene: SceneType) {}
+  constructor(private readonly scene: DluxSceneType) {}
 
   public addByte = (value: number) => this.bytes.push(BYTE(value));
 
   public addColor = (color: Color) => {
-    const array = Array.isArray(color) ? color : color in PredefinedColor ? colorToRGBW(color) : [color];
+    const array = Array.isArray(color) ? color : color in DluxPredefinedColor ? colorToRGBW(color) : [color];
 
     // This only works because the different color types have different amount of components (dlux also uses this fact internally)
     if (!this.colorSize) {
@@ -49,15 +49,15 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
   const d = new InternalLedData(scene.type);
 
   switch (scene.type) {
-    case SceneType.STATIC: {
+    case DluxSceneType.STATIC: {
       const o = scene as ISceneStatic<T>;
       d.addColor(o.color);
       break;
     }
 
-    case SceneType.PATTERN:
-    case SceneType.SWAP:
-    case SceneType.FLOW: {
+    case DluxSceneType.PATTERN:
+    case DluxSceneType.SWAP:
+    case DluxSceneType.FLOW: {
       const o = scene as ISceneFlow<T>;
 
       o.colors.forEach(p => {
@@ -69,7 +69,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
       break;
     }
 
-    case SceneType.STROBE: {
+    case DluxSceneType.STROBE: {
       const o = scene as ISceneStrobe<T>;
 
       d.addColor(o.color);
@@ -80,7 +80,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
       break;
     }
 
-    case SceneType.CHASE: {
+    case DluxSceneType.CHASE: {
       const o = scene as ISceneChase<T>;
 
       d.addColor(o.color);
@@ -94,7 +94,7 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
       break;
     }
 
-    case SceneType.STATIC_RANDOM:
+    case DluxSceneType.STATIC_RANDOM:
       break;
 
     default:
@@ -159,8 +159,8 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
 export const status = (msg: string): DluxLedStatus => {
   const a = msg.trim().split(":");
   const res: DluxLedStatus = {
-    scene: Number(a[0]) in SceneType ? (Number(a[0]) as SceneType) : SceneType.ERROR,
-    colorType: Number(a[1]) in ColorType ? (Number(a[1]) as ColorType) : ColorType.ERROR,
+    scene: Number(a[0]) in DluxSceneType ? (Number(a[0]) as DluxSceneType) : DluxSceneType.ERROR,
+    colorType: Number(a[1]) in DluxColorType ? (Number(a[1]) as DluxColorType) : DluxColorType.ERROR,
     bufferSize: Number(a[2]) || 0,
     sceneOn: a[5] === "1",
     sceneUpdating: a[6] === "1",
@@ -247,33 +247,33 @@ export const morse = <C extends Color>(
   });
 
   const scene: ISceneSwap<C> = {
-    type: SceneType.SWAP,
+    type: DluxSceneType.SWAP,
     colors,
   };
   return encode(scene);
 };
 
-export const colorToRGBW = (color: PredefinedColor): RGBW => {
+export const colorToRGBW = (color: DluxPredefinedColor): RGBW => {
   switch (color) {
-    case PredefinedColor.RED:
+    case DluxPredefinedColor.RED:
       return [255, 0, 0, 0];
-    case PredefinedColor.GREEN:
+    case DluxPredefinedColor.GREEN:
       return [0, 255, 0, 0];
-    case PredefinedColor.BLUE:
+    case DluxPredefinedColor.BLUE:
       return [0, 0, 255, 0];
-    case PredefinedColor.YELLOW:
+    case DluxPredefinedColor.YELLOW:
       return [255, 255, 0, 0];
-    case PredefinedColor.CYAN:
+    case DluxPredefinedColor.CYAN:
       return [0, 255, 255, 0];
-    case PredefinedColor.MAGENTA:
+    case DluxPredefinedColor.MAGENTA:
       return [255, 0, 255, 0];
-    case PredefinedColor.WHITE:
+    case DluxPredefinedColor.WHITE:
       return [255, 255, 255, 0];
-    case PredefinedColor.WARM_WHITE:
+    case DluxPredefinedColor.WARM_WHITE:
       return [0, 0, 0, 255];
-    case PredefinedColor.BLACK:
+    case DluxPredefinedColor.BLACK:
       return [0, 0, 0, 0];
-    case PredefinedColor.RANDOM:
+    case DluxPredefinedColor.RANDOM:
       return [1, 1, 1, 0].map(n => (n ? Math.floor(Math.random() * 256) : 0)) as RGBW;
   }
 };
@@ -283,15 +283,15 @@ export const statusToString = (status: DluxLedStatus): string => {
     return status.color.toString();
   }
   switch (status.scene) {
-    case SceneType.SWAP:
+    case DluxSceneType.SWAP:
       return "SWAP";
-    case SceneType.FLOW:
+    case DluxSceneType.FLOW:
       return "FLOW";
-    case SceneType.STROBE:
+    case DluxSceneType.STROBE:
       return "STROBE";
-    case SceneType.CHASE:
+    case DluxSceneType.CHASE:
       return "CHASE";
-    case SceneType.PATTERN:
+    case DluxSceneType.PATTERN:
       return "PATTERN";
     default:
       return "ERROR";
