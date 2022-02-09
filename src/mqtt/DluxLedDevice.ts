@@ -13,6 +13,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     sceneOn: false,
     sceneUpdating: false,
   };
+  private m_buffer: Buffer = Buffer.from("");
 
   constructor(name: string, topic: string, public readonly rgbw: boolean = true, client?: MqttClient) {
     super(name, topic, client);
@@ -57,13 +58,14 @@ export class DluxLedDevice extends DluxMqttDevice {
     return `${this.name} = ${statusToString(this.state)}`;
   }
 
-  public send<C extends Color>(scene: IScene<C>): void {
-    this.client.publish(this.sceneTopic, encode(scene));
+  public scene<C extends Color>(scene: IScene<C> | Buffer): void {
+    this.m_buffer = Buffer.isBuffer(scene) ? scene : encode(scene);
+    this._publish(this.sceneTopic, this.m_buffer);
   }
 
   public static(color: Color): void {
     const scene: ISceneStatic<Color> = { type: DluxSceneType.STATIC, color };
-    this.send(scene);
+    this.scene(scene);
   }
 
   public swap(colors: Color[], time: MS100): void {
@@ -72,7 +74,7 @@ export class DluxLedDevice extends DluxMqttDevice {
       type: DluxSceneType.SWAP,
       colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
     };
-    this.send(scene);
+    this.scene(scene);
   }
 
   public flow(colors: Color[], time: MS100): void {
@@ -81,11 +83,11 @@ export class DluxLedDevice extends DluxMqttDevice {
       type: DluxSceneType.FLOW,
       colors: swaps.concat(colors.length === 1 ? [BLACK(colors[0]), time] : []),
     };
-    this.send(scene);
+    this.scene(scene);
   }
 
   public morse(text: string, color: Color, color2: Color): void {
-    this._publish(this.sceneTopic, morse(text, color, color2));
+    this.scene(morse(text, color, color2));
   }
 
   public action(a: DluxLedAction): void {
