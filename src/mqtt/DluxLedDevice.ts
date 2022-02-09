@@ -56,9 +56,9 @@ export class DluxLedDevice extends DluxMqttDevice {
 
   private isBufferUpToDate(): boolean {
     // Check if the last sent buffer
-    return this.state.scene === this.m_buffer[0]
-      && this.state.colorType === this.m_buffer[1]
-      && this.state.bufferSize === Math.max(0, this.m_buffer.length - 2);
+    return (
+      this.state.scene === this.m_buffer[0] && this.state.colorType === this.m_buffer[1] && this.state.bufferSize === Math.max(0, this.m_buffer.length - 2)
+    );
   }
 
   public override toString(): string {
