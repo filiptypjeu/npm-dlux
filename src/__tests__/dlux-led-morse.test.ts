@@ -1,8 +1,8 @@
-import { morse } from "../led/functions";
+import { encode, morse } from "../led/functions";
 import { DluxSceneType } from "../led/enums";
 
 test("morse a HV", () => {
-  expect(morse("aa", [0, 255], [0, 0], 1, 2, 3, 4, 5)).toEqual(
+  expect(encode(morse("aa", [0, 255], [0, 0], 1, 2, 3, 4, 5))).toEqual(
     Buffer.from([
       DluxSceneType.SWAP,
       2,
@@ -41,7 +41,7 @@ test("morse a HV", () => {
 });
 
 test("morse hello HV", () => {
-  expect(morse("hello", [1, 1], [0, 0])).toEqual(
+  expect(encode(morse("hello", [1, 1], [0, 0]))).toEqual(
     Buffer.from([
       DluxSceneType.SWAP,
       2,
@@ -161,7 +161,7 @@ test("morse hello HV", () => {
 });
 
 test("morse må$! RGBW", () => {
-  expect(morse("må$!", [1, 2, 3, 4], [5, 6, 7, 8], 23)).toEqual(
+  expect(encode(morse("må$!", [1, 2, 3, 4], [5, 6, 7, 8], 23))).toEqual(
     Buffer.from([
       DluxSceneType.SWAP,
       4,

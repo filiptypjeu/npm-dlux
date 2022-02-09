@@ -203,7 +203,7 @@ export const morse = <C extends Color>(
   symboldSpace100ms?: MS100,
   letterSpace100ms?: MS100,
   wordSpace100ms?: MS100
-): Buffer => {
+): ISceneSwap<C> => {
   // Dit length must be between 1 and 36 (37*7 > 255)
   const dit = Math.min(Math.max(1, dit100ms), 36);
   const dah = dah100ms || dit * 3;
@@ -250,7 +250,7 @@ export const morse = <C extends Color>(
     type: DluxSceneType.SWAP,
     colors,
   };
-  return encode(scene);
+  return scene;
 };
 
 export const colorToRGBW = (color: DluxPredefinedColor): RGBW => {
