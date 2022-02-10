@@ -17,6 +17,10 @@ export class DluxLedMultiDevice extends DluxLedDevice {
     return this.devices.reduce<boolean>((res, d) => res || d.online, false);
   }
 
+  public override get statusString(): string {
+    return this.devices.map(d => d.statusString).join(", ");
+  }
+
   public override get subscriptions(): IDluxSubscription[] {
     return [];
   }
@@ -24,11 +28,6 @@ export class DluxLedMultiDevice extends DluxLedDevice {
   public override initialize(): this {
     return this;
   }
-
-  public override toString(): string {
-    return this.devices.map(d => `${d.name} = ${d.toString()}`).join(", ");
-  }
-
   public override scene<C extends Color>(scene: IScene<C> | Buffer): void {
     this.devices.forEach(d => d.scene(scene));
   }
