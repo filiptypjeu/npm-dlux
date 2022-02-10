@@ -116,7 +116,7 @@ export class DluxLedDevice extends DluxMqttDevice {
   public copyTo(device: DluxLedDevice): void {
     // Static information is easy to copy
     if (this.state.scene === DluxSceneType.STATIC) {
-      device.static(this.state.color!);
+      device.static(this.state.color || [0, 0, 0, 0]);
       return;
     }
 
