@@ -163,8 +163,6 @@ export class DluxMqttDevice {
    * Request states from the device.
    */
   public requestStates(): this {
-    this._publish(this.topic, "s"); // States
-    this._publish(this.topic, "g"); // GPIO inputs and outputs
     this._publish(this.topic, "v"); // Version
     return this;
   }
