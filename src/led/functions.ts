@@ -275,6 +275,8 @@ export const colorToRGBW = (color: DluxPredefinedColor): RGBW => {
       return [0, 0, 0, 0];
     case DluxPredefinedColor.RANDOM:
       return [1, 1, 1, 0].map(n => (n ? Math.floor(Math.random() * 256) : 0)) as RGBW;
+    case DluxPredefinedColor.TEKNOLOGRÖD:
+      return [178, 7, 56, 0];
   }
 };
 

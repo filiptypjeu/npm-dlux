@@ -35,4 +35,5 @@ export enum DluxPredefinedColor {
   WARM_WHITE,
   BLACK,
   RANDOM,
+  TEKNOLOGRÖD,
 }
