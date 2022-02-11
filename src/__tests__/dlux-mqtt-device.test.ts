@@ -1,6 +1,9 @@
 import { DluxMqttDevice } from "../mqtt/DluxMqttDevice";
 
-const d = new DluxMqttDevice("device", "dlux/l1");
+const d = new DluxMqttDevice({
+  name: "device",
+  topic: "dlux/l1",
+});
 
 test("dlux mqtt device basic properties", () => {
   expect(d.name).toEqual("device");

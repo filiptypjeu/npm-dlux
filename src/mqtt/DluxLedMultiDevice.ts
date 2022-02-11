@@ -6,7 +6,10 @@ import { IDluxSubscription } from "./DluxMqttDevice";
 
 export class DluxLedMultiDevice extends DluxLedDevice {
   constructor(name: string, public readonly devices: DluxLedDevice[]) {
-    super(name, "");
+    super({
+      name,
+      topic: "",
+    });
   }
 
   public override get state(): DluxLedStatus {

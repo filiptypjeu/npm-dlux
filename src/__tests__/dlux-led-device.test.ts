@@ -1,7 +1,7 @@
 import { DluxLedDevice } from "../mqtt/DluxLedDevice";
 import { DluxColorType, DluxSceneType } from "../led/enums";
 
-const d = new DluxLedDevice("led", "dlux/l2");
+const d = new DluxLedDevice({ name: "led", topic: "dlux/l2" });
 
 test("dlux mqtt led device basic properties", () => {
   expect(d.name).toEqual("led");

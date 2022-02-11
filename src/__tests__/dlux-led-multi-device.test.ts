@@ -1,8 +1,8 @@
 import { DluxLedDevice } from "../mqtt/DluxLedDevice";
 import { DluxLedMultiDevice } from "../mqtt/DluxLedMultiDevice";
 
-const d1 = new DluxLedDevice("D1", "dlux/l1");
-const d2 = new DluxLedDevice("D2", "dlux/l2");
+const d1 = new DluxLedDevice({ name: "D1", topic: "dlux/l1" });
+const d2 = new DluxLedDevice({ name: "D2", topic: "dlux/l2"});
 const d = new DluxLedMultiDevice("ALL", [d1, d2]);
 
 test("dlux led multi device basic properties", () => {

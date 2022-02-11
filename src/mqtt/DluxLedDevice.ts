@@ -6,6 +6,8 @@ import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../
 import { Color, MS100, Swaps } from "../led/types";
 
 export class DluxLedDevice extends DluxMqttDevice {
+  public readonly rgbw: boolean;
+
   private m_state: DluxLedStatus = {
     scene: DluxSceneType.ERROR,
     colorType: DluxColorType.ERROR,
@@ -15,8 +17,17 @@ export class DluxLedDevice extends DluxMqttDevice {
   };
   private m_buffer: Buffer = Buffer.from("");
 
-  constructor(name: string, topic: string, public readonly rgbw: boolean = true, client?: MqttClient) {
-    super(name, topic, client);
+  constructor(o: {
+    // DluxMqttDevice
+    name: string;
+    topic: string;
+    client?: MqttClient;
+
+    // Own
+    rgbw?: boolean;
+  }) {
+    super(o);
+    this.rgbw = o.rgbw || false;
   }
 
   /**

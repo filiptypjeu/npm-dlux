@@ -3,12 +3,16 @@ import { MqttClient } from "mqtt";
 // export type DluxInput = number | boolean | undefined;
 // export type DluxOutput = boolean | undefined;
 
+// XXX: Add HA support?
+
 export interface IDluxSubscription {
   topic: string;
   callback: (paylaod: Buffer) => void;
 }
 
 export class DluxMqttDevice {
+  public readonly name: string;
+
   private readonly m_topic: string;
   private m_client: MqttClient | undefined;
 
@@ -17,9 +21,14 @@ export class DluxMqttDevice {
   protected m_inputs: string = ":::::::";
   protected m_outputs: string = "--------";
 
-  constructor(public readonly name: string, topic?: string, client?: MqttClient) {
-    this.m_topic = topic || "";
-    if (client) this.initialize(client);
+  constructor(o: {
+    name: string;
+    topic: string;
+    client?: MqttClient;
+  }) {
+    this.name = o.name;
+    this.m_topic = o.topic;
+    if (o.client) this.initialize(o.client);
   }
 
   protected _publish(topic: string, buffer: Buffer | string) {
