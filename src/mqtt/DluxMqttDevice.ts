@@ -21,11 +21,7 @@ export class DluxMqttDevice {
   protected m_inputs: string = ":::::::";
   protected m_outputs: string = "--------";
 
-  constructor(o: {
-    name: string;
-    topic: string;
-    client?: MqttClient;
-  }) {
+  constructor(o: { name: string; topic: string; client?: MqttClient }) {
     this.name = o.name;
     this.m_topic = o.topic;
     if (o.client) this.initialize(o.client);
