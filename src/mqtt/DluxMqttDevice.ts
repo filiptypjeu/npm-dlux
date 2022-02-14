@@ -10,6 +10,11 @@ export interface IDluxSubscription {
   callback: (paylaod: Buffer) => void;
 }
 
+interface IDluxMqttClient {
+  publish(topic: string, payload: Buffer): void;
+  subscribe(topic: string): void;
+}
+
 export class DluxMqttDevice {
   public readonly name: string;
 
@@ -147,20 +152,21 @@ export class DluxMqttDevice {
   /**
    * Add listeners for all subscriptions of this implementation.
    */
-  public addListeners(): this {
-    this.subscriptions.forEach(s =>
-      this.client.addListener("message", (t: string, p: Buffer) => {
-        if (t === s.topic) s.callback(p);
-      })
-    );
+  public addListener(): this {
+    this.client.addListener("message", (t: string, p: Buffer) => {
+      console.log(t, p);
+      const sub = this.subscriptions.find(s => s.topic === t);
+      if (!sub) return;
+      sub.callback(p);
+    });
     return this;
   }
 
   /**
-   * Subsctibe to all subscription topics of this implementation.
+   * Subsctibe to the device topic.
    */
   public subscribe(): this {
-    this.subscriptions.forEach(s => this.client.subscribe(s.topic));
+    this.client.subscribe(this.topic + "/*");
     return this;
   }
 
@@ -177,7 +183,7 @@ export class DluxMqttDevice {
    */
   public initialize(client: MqttClient): this {
     this.client = client;
-    this.addListeners();
+    this.addListener();
     this.subscribe();
     this.requestStates();
     return this;
