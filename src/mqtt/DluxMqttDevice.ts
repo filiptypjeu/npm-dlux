@@ -1,5 +1,3 @@
-import { MqttClient } from "mqtt";
-
 // export type DluxInput = number | boolean | undefined;
 // export type DluxOutput = boolean | undefined;
 
@@ -10,23 +8,24 @@ export interface IDluxSubscription {
   callback: (paylaod: Buffer) => void;
 }
 
-interface IDluxMqttClient {
-  publish(topic: string, payload: Buffer): void;
+export interface IDluxMqttClient {
+  publish(topic: string, payload: Buffer | string): void;
   subscribe(topic: string): void;
+  addListener(event: "message", callback: (topic: string, payload: Buffer) => void): void;
 }
 
 export class DluxMqttDevice {
   public readonly name: string;
 
   private readonly m_topic: string;
-  private m_client: MqttClient | undefined;
+  private m_client: IDluxMqttClient | undefined;
 
   protected m_status: string = "offline";
   protected m_version: string = "";
   protected m_inputs: string = ":::::::";
   protected m_outputs: string = "--------";
 
-  constructor(o: { name: string; topic: string; client?: MqttClient }) {
+  constructor(o: { name: string; topic: string; client?: IDluxMqttClient }) {
     this.name = o.name;
     this.m_topic = o.topic;
     if (o.client) this.initialize(o.client);
@@ -135,7 +134,7 @@ export class DluxMqttDevice {
   /**
    * Get the MQTT client for this implementation.
    */
-  public get client(): MqttClient {
+  public get client(): IDluxMqttClient {
     if (!this.m_client) {
       throw new Error(`DluxMqttDevice "${this.name}" does not have an MQTT client"`);
     }
@@ -145,16 +144,15 @@ export class DluxMqttDevice {
   /**
    * Set the MQTT client for this implementation.
    */
-  public set client(client: MqttClient) {
+  public set client(client: IDluxMqttClient) {
     this.m_client = client;
   }
 
   /**
-   * Add listeners for all subscriptions of this implementation.
+   * Add a listener that calls the correct callback for subscriptions of this implementation.
    */
   public addListener(): this {
     this.client.addListener("message", (t: string, p: Buffer) => {
-      console.log(t, p);
       const sub = this.subscriptions.find(s => s.topic === t);
       if (!sub) return;
       sub.callback(p);
@@ -163,10 +161,10 @@ export class DluxMqttDevice {
   }
 
   /**
-   * Subsctibe to the device topic.
+   * Subscribe to all device subtopics.
    */
   public subscribe(): this {
-    this.client.subscribe(this.topic + "/*");
+    this.client.subscribe(this.topic + "/+");
     return this;
   }
 
@@ -181,7 +179,7 @@ export class DluxMqttDevice {
   /**
    * Initialize this implementation fully (set client, add listeners, subscribe and request states).
    */
-  public initialize(client: MqttClient): this {
+  public initialize(client: IDluxMqttClient): this {
     this.client = client;
     this.addListener();
     this.subscribe();

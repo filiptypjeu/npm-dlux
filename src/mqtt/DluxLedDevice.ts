@@ -1,6 +1,5 @@
-import { MqttClient } from "mqtt";
 import { status, encode, morse, statusToString } from "../led/functions";
-import { DluxMqttDevice, IDluxSubscription } from "./DluxMqttDevice";
+import { DluxMqttDevice, IDluxMqttClient, IDluxSubscription } from "./DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "../led/enums";
 import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
 import { Color, MS100, Swaps } from "../led/types";
@@ -21,7 +20,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     // DluxMqttDevice
     name: string;
     topic: string;
-    client?: MqttClient;
+    client?: IDluxMqttClient;
 
     // Own
     rgbw?: boolean;

@@ -75,5 +75,5 @@ test("dlux mqtt device throw when no client", () => {
   expect(() => d.client).toThrow();
   expect(() => d.subscribe()).toThrow();
   expect(() => d.requestStates()).toThrow();
-  expect(() => d.addListeners()).toThrow();
+  expect(() => d.addListener()).toThrow();
 });

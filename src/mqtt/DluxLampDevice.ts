@@ -1,7 +1,6 @@
-import { MqttClient } from "mqtt";
 import { DluxLampCommand } from "../lamp/enums";
 import { DluxLamp } from "../lamp/interfaces";
-import { DluxMqttDevice, IDluxSubscription } from "./DluxMqttDevice";
+import { DluxMqttDevice, IDluxMqttClient, IDluxSubscription } from "./DluxMqttDevice";
 
 export class DluxLampDevice extends DluxMqttDevice {
   private m_state: string = "";
@@ -11,7 +10,7 @@ export class DluxLampDevice extends DluxMqttDevice {
     name: string;
     topic: string;
     ha?: boolean;
-    client?: MqttClient;
+    client?: IDluxMqttClient;
   }) {
     super(o);
   }
