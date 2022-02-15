@@ -1,5 +1,5 @@
-import { DluxEventReason, DluxEventSource } from "./enums";
-import { IDluxMqttClient, IDluxSubscription, IDluxEvent } from "./interfaces";
+import { DluxEventSource } from "./enums";
+import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
 import { DluxEventCallbackSignature } from "./types";
 
 // XXX: Add HA support?
@@ -122,18 +122,11 @@ export class DluxMqttDevice {
         topic: this.eventsTopic,
         callback: payload => {
           const a = payload.toString().split(":");
-          const event: IDluxEvent = {};
-
-          const source = Object.values(DluxEventSource).find(e => e === a[0]);
-          if (source) event.source = source;
-
-          const reason = Object.values(DluxEventReason).find(e => e === a[2]);
-          if (reason) event.reason = reason;
-
-          const n = Number(a[1]);
-          if (!Number.isNaN(n)) event.n = n;
-
-          this.m_eventCallback!(event);
+          this.m_eventCallback!({
+            source: a[0] as DluxEventSource,
+            n: Number(a[1]),
+            action: a[2] === "1",
+          });
         }
       });
     }

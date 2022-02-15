@@ -1,4 +1,4 @@
-import { DluxEventReason, DluxEventSource } from "./enums";
+import { DluxEventSource } from "./enums";
 
 export interface IDluxSubscription {
     topic: string;
@@ -12,7 +12,7 @@ export interface IDluxMqttClient {
 }
 
 export interface IDluxEvent {
-  source?: DluxEventSource;
-  n?: number;
-  reason?: DluxEventReason;
+  source: DluxEventSource;
+  n: number;
+  action: boolean;
 }

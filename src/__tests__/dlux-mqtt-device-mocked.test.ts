@@ -1,4 +1,4 @@
-import { DluxEventReason, DluxEventSource, DluxMqttDevice, IDluxEvent } from "../index";
+import { DluxEventSource, DluxMqttDevice, IDluxEvent } from "../index";
 import { MqttClientMock } from "./MqttClientMock.test";
 
 const client = new MqttClientMock();
@@ -84,19 +84,19 @@ test("dlux mqtt device mocked outputs topic", () => {
 
 test("dlux mqtt device mocked event", () => {
   expect(events).toHaveLength(0);
-  client.mock("dlux/l1/events", Buffer.from("D:13:D"));
+  client.mock("dlux/l1/events", Buffer.from("D:13:1"));
   expect(events).toHaveLength(1);
-  client.mock("dlux/l1/events", Buffer.from("I:5:R"));
+  client.mock("dlux/l1/events", Buffer.from("I:5:0"));
   expect(events).toHaveLength(2);
   client.mock("dlux/l1/events", Buffer.from("a:a:a:a"));
   expect(events).toHaveLength(3);
   expect(events).toEqual([
     {
-      source: DluxEventSource.DLUX, n: 13, reason: DluxEventReason.DOWN,
+      source: DluxEventSource.DLUX_BUTTON, n: 13, action: true,
     }, {
-      source: DluxEventSource.INPUT, n: 5, reason: DluxEventReason.RISE,
+      source: DluxEventSource.GPIO_INPUT, n: 5, action: false,
     }, {
-      source: undefined, n: undefined, reason: undefined,
+      source: "a", n: NaN, action: false,
     }
   ])
 });
