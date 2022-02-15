@@ -1,5 +1,4 @@
-import { status } from "../led/functions";
-import { DluxColorType, DluxSceneType } from "../led/enums";
+import { DluxColorType, DluxSceneType, status } from "../index";
 
 test("status #1", () => {
   expect(status("3:3:10:1:1:1:1:123,-1,1000")).toEqual({

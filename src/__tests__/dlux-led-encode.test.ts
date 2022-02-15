@@ -1,7 +1,4 @@
-import { DluxColorType, DluxSceneType, DluxPredefinedColor } from "../led/enums";
-import { encode } from "../led/functions";
-import { IScene, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap } from "../led/interfaces";
-import { Hue, HV, RGB, RGBW } from "../led/types";
+import { DluxColorType, DluxSceneType, DluxPredefinedColor, encode, IScene, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, Hue, HV, RGB, RGBW } from "../index";
 
 test("encode non-supported scene type throw", () => {
   const o: ISceneStatic<HV> = {

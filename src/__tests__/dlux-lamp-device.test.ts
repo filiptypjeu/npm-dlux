@@ -1,4 +1,4 @@
-import { DluxLampDevice } from "../mqtt/DluxLampDevice";
+import { DluxLampDevice } from "../index";
 
 const d = new DluxLampDevice({
   name: "gatan",

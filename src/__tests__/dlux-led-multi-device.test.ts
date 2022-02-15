@@ -1,5 +1,4 @@
-import { DluxLedDevice } from "../mqtt/DluxLedDevice";
-import { DluxLedMultiDevice } from "../mqtt/DluxLedMultiDevice";
+import { DluxLedDevice, DluxLedMultiDevice } from "../index";
 
 const d1 = new DluxLedDevice({ name: "D1", topic: "dlux/l1" });
 const d2 = new DluxLedDevice({ name: "D2", topic: "dlux/l2" });

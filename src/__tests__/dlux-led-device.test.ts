@@ -1,5 +1,4 @@
-import { DluxLedDevice } from "../mqtt/DluxLedDevice";
-import { DluxColorType, DluxSceneType } from "../led/enums";
+import { DluxColorType, DluxLedDevice, DluxSceneType } from "../index";
 
 const d = new DluxLedDevice({ name: "led", topic: "dlux/l2" });
 

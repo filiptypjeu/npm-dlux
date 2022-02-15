@@ -1,5 +1,4 @@
-import { encode, morse } from "../led/functions";
-import { DluxSceneType } from "../led/enums";
+import { DluxSceneType, encode, morse } from "../index";
 
 test("morse a HV", () => {
   expect(encode(morse("aa", [0, 255], [0, 0], 1, 2, 3, 4, 5))).toEqual(
