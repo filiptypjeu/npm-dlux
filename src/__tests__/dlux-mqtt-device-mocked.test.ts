@@ -1,11 +1,14 @@
-import { DluxMqttDevice } from "../index";
+import { DluxEventReason, DluxEventSource, DluxMqttDevice, IDluxEvent } from "../index";
 import { MqttClientMock } from "./MqttClientMock.test";
 
 const client = new MqttClientMock();
 
+const events: IDluxEvent[] = [];
+
 const d = new DluxMqttDevice({
   name: "device",
   topic: "dlux/l1",
+  eventCallback: (e: IDluxEvent) => events.push(e),
 });
 d.initialize(client);
 
@@ -15,13 +18,14 @@ test("mocked client inital publishes", () => {
 });
 
 test("mocked client inital subscriptions", () => {
-  expect(client.subscriptions).toHaveLength(5);
+  expect(client.subscriptions).toHaveLength(6);
   expect(client.subscriptions).toEqual([
     "dlux/l1/status",
     "dlux/l1/version",
     "dlux/l1/log",
     "dlux/l1/inputs",
     "dlux/l1/outputs",
+    "dlux/l1/events",
   ]);
 });
 
@@ -78,8 +82,27 @@ test("dlux mqtt device mocked outputs topic", () => {
   expect(d.outputs[3]).toEqual(undefined);
 });
 
+test("dlux mqtt device mocked event", () => {
+  expect(events).toHaveLength(0);
+  client.mock("dlux/l1/events", Buffer.from("D:13:D"));
+  expect(events).toHaveLength(1);
+  client.mock("dlux/l1/events", Buffer.from("I:5:R"));
+  expect(events).toHaveLength(2);
+  client.mock("dlux/l1/events", Buffer.from("a:a:a:a"));
+  expect(events).toHaveLength(3);
+  expect(events).toEqual([
+    {
+      source: DluxEventSource.DLUX, n: 13, reason: DluxEventReason.DOWN,
+    }, {
+      source: DluxEventSource.INPUT, n: 5, reason: DluxEventReason.RISE,
+    }, {
+      source: undefined, n: undefined, reason: undefined,
+    }
+  ])
+});
+
 test("mocked client state after tests", () => {
   expect(client.publishes).toHaveLength(1);
-  expect(client.subscriptions).toHaveLength(5);
+  expect(client.subscriptions).toHaveLength(6);
   expect(client.listeners).toHaveLength(1);
 });

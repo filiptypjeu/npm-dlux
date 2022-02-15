@@ -3,6 +3,7 @@ import { DluxMqttDevice } from "./DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "../led/enums";
 import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
 import { Color, MS100, Swaps } from "../led/types";
+import { DluxEventCallbackSignature } from "./types";
 import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
 
 export class DluxLedDevice extends DluxMqttDevice {
@@ -22,6 +23,7 @@ export class DluxLedDevice extends DluxMqttDevice {
     name: string;
     topic: string;
     client?: IDluxMqttClient;
+    eventCallback?: DluxEventCallbackSignature;
 
     // Own
     rgbw?: boolean;

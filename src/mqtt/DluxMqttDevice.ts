@@ -1,7 +1,6 @@
-// export type DluxInput = number | boolean | undefined;
-// export type DluxOutput = boolean | undefined;
-
-import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
+import { DluxEventReason, DluxEventSource } from "./enums";
+import { IDluxMqttClient, IDluxSubscription, IDluxEvent } from "./interfaces";
+import { DluxEventCallbackSignature } from "./types";
 
 // XXX: Add HA support?
 
@@ -15,10 +14,12 @@ export class DluxMqttDevice {
   protected m_version: string = "";
   protected m_inputs: string = ":::::::";
   protected m_outputs: string = "--------";
+  public m_eventCallback: DluxEventCallbackSignature | undefined;
 
-  constructor(o: { name: string; topic: string; client?: IDluxMqttClient }) {
+  constructor(o: { name: string; topic: string; client?: IDluxMqttClient, eventCallback?: DluxEventCallbackSignature }) {
     this.name = o.name;
     this.m_topic = o.topic;
+    this.m_eventCallback = o.eventCallback;
     if (o.client) this.initialize(o.client);
   }
 
@@ -77,13 +78,19 @@ export class DluxMqttDevice {
   public get inputsTopic(): string {
     return this.topic + "/inputs";
   }
+  /**
+   * Get the topic in which the device publishes events.
+   */
+  public get eventsTopic(): string {
+    return this.topic + "/events";
+  }
 
   protected get commonSubscriptions(): IDluxSubscription[] {
     if (!this.m_topic) {
       return [];
     }
 
-    return [
+    const subs: IDluxSubscription[] = [
       {
         topic: this.statusTopic,
         callback: payload => (this.m_status = payload.toString()),
@@ -109,6 +116,29 @@ export class DluxMqttDevice {
         callback: payload => (this.m_outputs = payload.toString()),
       },
     ];
+
+    if (this.m_eventCallback) {
+      subs.push({
+        topic: this.eventsTopic,
+        callback: payload => {
+          const a = payload.toString().split(":");
+          const event: IDluxEvent = {};
+
+          const source = Object.values(DluxEventSource).find(e => e === a[0]);
+          if (source) event.source = source;
+
+          const reason = Object.values(DluxEventReason).find(e => e === a[2]);
+          if (reason) event.reason = reason;
+
+          const n = Number(a[1]);
+          if (!Number.isNaN(n)) event.n = n;
+
+          this.m_eventCallback!(event);
+        }
+      });
+    }
+
+    return subs;
   }
 
   protected get deviceSubscriptions(): IDluxSubscription[] {
