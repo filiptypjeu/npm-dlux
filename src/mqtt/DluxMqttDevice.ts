@@ -16,7 +16,7 @@ export class DluxMqttDevice {
   protected m_outputs: string = "--------";
   public m_eventCallback: DluxEventCallbackSignature | undefined;
 
-  constructor(o: { name: string; topic: string; client?: IDluxMqttClient, eventCallback?: DluxEventCallbackSignature }) {
+  constructor(o: { name: string; topic: string; client?: IDluxMqttClient; eventCallback?: DluxEventCallbackSignature }) {
     this.name = o.name;
     this.m_topic = o.topic;
     this.m_eventCallback = o.eventCallback;
@@ -128,7 +128,7 @@ export class DluxMqttDevice {
             n: Number(a[1]),
             action: a[2] === "1",
           });
-        }
+        },
       });
     }
 

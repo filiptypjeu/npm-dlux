@@ -1,8 +1,8 @@
 import { DluxEventSource } from "./enums";
 
 export interface IDluxSubscription {
-    topic: string;
-    callback: (paylaod: Buffer) => void;
+  topic: string;
+  callback: (paylaod: Buffer) => void;
 }
 
 export interface IDluxMqttClient {

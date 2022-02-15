@@ -1,4 +1,20 @@
-import { DluxColorType, DluxSceneType, DluxPredefinedColor, encode, IScene, ISceneChase, ISceneFlow, IScenePattern, ISceneStatic, ISceneStrobe, ISceneSwap, Hue, HV, RGB, RGBW } from "../index";
+import {
+  DluxColorType,
+  DluxSceneType,
+  DluxPredefinedColor,
+  encode,
+  IScene,
+  ISceneChase,
+  ISceneFlow,
+  IScenePattern,
+  ISceneStatic,
+  ISceneStrobe,
+  ISceneSwap,
+  Hue,
+  HV,
+  RGB,
+  RGBW,
+} from "../index";
 
 test("encode non-supported scene type throw", () => {
   const o: ISceneStatic<HV> = {

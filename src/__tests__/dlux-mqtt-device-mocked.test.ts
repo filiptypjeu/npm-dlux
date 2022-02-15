@@ -19,14 +19,7 @@ test("mocked client inital publishes", () => {
 
 test("mocked client inital subscriptions", () => {
   expect(client.subscriptions).toHaveLength(6);
-  expect(client.subscriptions).toEqual([
-    "dlux/l1/status",
-    "dlux/l1/version",
-    "dlux/l1/log",
-    "dlux/l1/inputs",
-    "dlux/l1/outputs",
-    "dlux/l1/events",
-  ]);
+  expect(client.subscriptions).toEqual(["dlux/l1/status", "dlux/l1/version", "dlux/l1/log", "dlux/l1/inputs", "dlux/l1/outputs", "dlux/l1/events"]);
 });
 
 test("mocked client inital listeners", () => {
@@ -92,13 +85,21 @@ test("dlux mqtt device mocked event", () => {
   expect(events).toHaveLength(3);
   expect(events).toEqual([
     {
-      source: DluxEventSource.DLUX_BUTTON, n: 13, action: true,
-    }, {
-      source: DluxEventSource.GPIO_INPUT, n: 5, action: false,
-    }, {
-      source: "a", n: NaN, action: false,
-    }
-  ])
+      source: DluxEventSource.DLUX_BUTTON,
+      n: 13,
+      action: true,
+    },
+    {
+      source: DluxEventSource.GPIO_INPUT,
+      n: 5,
+      action: false,
+    },
+    {
+      source: "a",
+      n: NaN,
+      action: false,
+    },
+  ]);
 });
 
 test("mocked client state after tests", () => {
