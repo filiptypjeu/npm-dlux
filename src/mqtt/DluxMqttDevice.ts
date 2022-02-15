@@ -164,7 +164,7 @@ export class DluxMqttDevice {
    * Subscribe to all device subtopics.
    */
   public subscribe(): this {
-    this.client.subscribe(this.topic + "/+");
+    this.subscriptions.forEach(s => this.client.subscribe(s.topic));
     return this;
   }
 
