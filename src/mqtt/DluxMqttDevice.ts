@@ -1,18 +1,9 @@
 // export type DluxInput = number | boolean | undefined;
 // export type DluxOutput = boolean | undefined;
 
+import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
+
 // XXX: Add HA support?
-
-export interface IDluxSubscription {
-  topic: string;
-  callback: (paylaod: Buffer) => void;
-}
-
-export interface IDluxMqttClient {
-  publish(topic: string, payload: Buffer | string): void;
-  subscribe(topic: string): void;
-  addListener(event: "message", callback: (topic: string, payload: Buffer) => void): void;
-}
 
 export class DluxMqttDevice {
   public readonly name: string;

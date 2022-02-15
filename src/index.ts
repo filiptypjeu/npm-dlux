@@ -6,3 +6,4 @@ export * from "./mqtt/DluxMqttDevice";
 export * from "./mqtt/DluxLedDevice";
 export * from "./mqtt/DluxLedMultiDevice";
 export * from "./mqtt/DluxLampDevice";
+export * from "./mqtt/interfaces";

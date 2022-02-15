@@ -1,8 +1,9 @@
 import { status, encode, morse, statusToString } from "../led/functions";
-import { DluxMqttDevice, IDluxMqttClient, IDluxSubscription } from "./DluxMqttDevice";
+import { DluxMqttDevice } from "./DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "../led/enums";
 import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
 import { Color, MS100, Swaps } from "../led/types";
+import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
 
 export class DluxLedDevice extends DluxMqttDevice {
   public readonly rgbw: boolean;
