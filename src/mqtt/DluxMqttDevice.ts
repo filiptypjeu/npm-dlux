@@ -101,6 +101,7 @@ export class DluxMqttDevice {
       },
       {
         topic: this.logTopic,
+        // XXX: Legacy
         callback: payload => {
           const msg = payload.toString();
           if (!msg.startsWith("Version = ")) return;
@@ -186,6 +187,7 @@ export class DluxMqttDevice {
    * Request states from the device.
    */
   public requestStates(): this {
+    // XXX: Legacy
     this._publish(this.topic, "v"); // Version
     return this;
   }
