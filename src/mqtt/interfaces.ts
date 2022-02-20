@@ -14,5 +14,5 @@ export interface IDluxMqttClient {
 export interface IDluxEvent {
   source: DluxEventSource;
   n: number;
-  action: boolean;
+  value: number;
 }

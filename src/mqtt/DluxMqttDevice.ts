@@ -126,7 +126,7 @@ export class DluxMqttDevice {
           this.m_eventCallback!({
             source: a[0] as DluxEventSource,
             n: Number(a[1]),
-            action: a[2] === "1",
+            value: Number(a[2]),
           });
         },
       });

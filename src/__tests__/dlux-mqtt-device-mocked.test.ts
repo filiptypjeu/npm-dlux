@@ -87,17 +87,17 @@ test("dlux mqtt device mocked event", () => {
     {
       source: DluxEventSource.DLUX_BUTTON,
       n: 13,
-      action: true,
+      value: 1,
     },
     {
       source: DluxEventSource.GPIO_INPUT,
       n: 5,
-      action: false,
+      value: 0,
     },
     {
       source: "a",
       n: NaN,
-      action: false,
+      value: NaN,
     },
   ]);
 });
