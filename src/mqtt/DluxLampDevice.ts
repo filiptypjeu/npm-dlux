@@ -60,12 +60,24 @@ export class DluxLampDevice extends DluxMqttDevice {
       return;
     }
 
-    const a: DluxLampCommand[] = [];
+    // Search for the largest index
+    let i = -1;
+    for (const lamp of lamps) {
+      if (lamp.index > i) {
+        i = lamp.index;
+      }
+    }
+
+    if (i < 0) {
+      return;
+    }
+
+    const a = Array(i+1).fill(DluxLampCommand.NO_CHANGE);
     for (const lamp of lamps) {
       if (lamp.index < 0) continue;
       a[lamp.index] = lamp.state;
     }
 
-    this._publish(this.lampTopic, a.map(s => (s ? s : DluxLampCommand.NO_CHANGE)).join(""));
+    this._publish(this.setLampsTopic, a.join(""));
   }
 }
