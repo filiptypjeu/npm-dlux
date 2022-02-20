@@ -5,7 +5,7 @@ import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
 import { DluxEventCallbackSignature } from "./types";
 
 export class DluxLampDevice extends DluxMqttDevice {
-  private m_state: string = "";
+  private m_lamps: string = "";
 
   constructor(o: {
     // DluxMqttDevice
@@ -19,7 +19,7 @@ export class DluxLampDevice extends DluxMqttDevice {
   }
 
   /**
-   * Get the topic in which the device publishes its current state.
+   * Get the topic in which the device publishes its current lamp states.
    */
   public get lampsTopic(): string {
     return this.topic + "/lamps";
@@ -27,29 +27,29 @@ export class DluxLampDevice extends DluxMqttDevice {
   /**
    * Get the topic in which the device can be sent lamp commands.
    */
-  public get lampTopic(): string {
+  public get setLampsTopic(): string {
     return this.topic + "/l";
   }
 
   /**
-   * Get the current state of the LED device.
+   * Get the current states of the lamps of this device.
    */
-  public get state(): string {
-    return this.m_state;
+  public get lamps(): string {
+    return this.m_lamps;
   }
 
   protected override get deviceSubscriptions(): IDluxSubscription[] {
     return [
       {
         topic: this.lampsTopic,
-        callback: msg => (this.m_state = msg.toString()),
+        callback: msg => (this.m_lamps = msg.toString()),
       },
     ];
   }
 
   public setLamp(lamp: DluxLamp): void {
     if (lamp.index < 0) return;
-    this._publish(`${this.lampTopic}/${lamp.index + 1}`, lamp.state);
+    this._publish(`${this.setLampsTopic}/${lamp.index + 1}`, lamp.state);
   }
 
   public setLamps(lamps: DluxLamp[]): void {

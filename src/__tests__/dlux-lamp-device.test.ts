@@ -8,22 +8,22 @@ const d = new DluxLampDevice({
 test("dlux lamp device basic properties", () => {
   expect(d.name).toEqual("gatan");
   expect(d.topic).toEqual("dlux/gt");
-  expect(d.statesTopic).toEqual("dlux/gt/states");
-  expect(d.lampTopic).toEqual("dlux/gt/l");
+  expect(d.lampsTopic).toEqual("dlux/gt/lamps");
+  expect(d.setLampsTopic).toEqual("dlux/gt/l");
 });
 
 const subs = d.subscriptions;
 
 test("dlux lamp device subscriptions", () => {
   expect(subs).toHaveLength(6);
-  expect(subs[5].topic).toEqual("dlux/gt/states");
+  expect(subs[5].topic).toEqual("dlux/gt/lamps");
 });
 
-test("dlux lamp device default state", () => {
-  expect(d.state).toEqual("");
+test("dlux lamp device default lamp states", () => {
+  expect(d.lamps).toEqual("");
 });
 
-test("dlux lamp device state callback", () => {
+test("dlux lamp device lamp state callback", () => {
   subs[5].callback(Buffer.from("10110010--------"));
-  expect(d.state).toEqual("10110010--------");
+  expect(d.lamps).toEqual("10110010--------");
 });
