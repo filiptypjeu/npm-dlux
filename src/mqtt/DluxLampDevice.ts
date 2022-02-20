@@ -72,7 +72,7 @@ export class DluxLampDevice extends DluxMqttDevice {
       return;
     }
 
-    const a = Array(i+1).fill(DluxLampCommand.NO_CHANGE);
+    const a = Array(i + 1).fill(DluxLampCommand.NO_CHANGE);
     for (const lamp of lamps) {
       if (lamp.index < 0) continue;
       a[lamp.index] = lamp.state;

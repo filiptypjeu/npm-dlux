@@ -44,14 +44,21 @@ test("dlux lamp device mocked set one lamp", () => {
 test("dlux lamp device mocked set lamps", () => {
   d.setLamps([{ index: 0, state: DluxLampCommand.ON }]);
   expect(client.lastPublish).toEqual({ topic: "dlux/gt/l/1", payload: "1" });
-  d.setLamps([{ index: 1, state: DluxLampCommand.ON }, { index: 3, state: DluxLampCommand.TOGGLE }, { index: 5, state: DluxLampCommand.OFF }]);
+  d.setLamps([
+    { index: 1, state: DluxLampCommand.ON },
+    { index: 3, state: DluxLampCommand.TOGGLE },
+    { index: 5, state: DluxLampCommand.OFF },
+  ]);
   expect(client.lastPublish).toEqual({ topic: "dlux/gt/l", payload: "-1-T-0" });
 });
 
 test("dlux lamp device mocked set lamps invalid indexes", () => {
   expect(client.publishes).toHaveLength(7);
   d.setLamp({ index: -2, state: DluxLampCommand.ON });
-  d.setLamps([{ index: -2, state: DluxLampCommand.ON }, { index: -3, state: DluxLampCommand.ON }]);
+  d.setLamps([
+    { index: -2, state: DluxLampCommand.ON },
+    { index: -3, state: DluxLampCommand.ON },
+  ]);
   expect(client.publishes).toHaveLength(7);
 });
 
