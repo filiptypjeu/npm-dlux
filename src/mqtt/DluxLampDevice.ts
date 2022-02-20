@@ -21,8 +21,8 @@ export class DluxLampDevice extends DluxMqttDevice {
   /**
    * Get the topic in which the device publishes its current state.
    */
-  public get statesTopic(): string {
-    return this.topic + "/states";
+  public get lampsTopic(): string {
+    return this.topic + "/lamps";
   }
   /**
    * Get the topic in which the device can be sent lamp commands.
@@ -41,7 +41,7 @@ export class DluxLampDevice extends DluxMqttDevice {
   protected override get deviceSubscriptions(): IDluxSubscription[] {
     return [
       {
-        topic: this.statesTopic,
+        topic: this.lampsTopic,
         callback: msg => (this.m_state = msg.toString()),
       },
     ];
