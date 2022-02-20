@@ -1,11 +1,24 @@
 import { IDluxMqttClient } from "../index";
 
+export interface IPublishMock {
+  topic: string;
+  payload: string;
+}
+
 export class MqttClientMock implements IDluxMqttClient {
-  public publishes: { topic: string; payload: string }[] = [];
+  public publishes: IPublishMock[] = [];
   public subscriptions: string[] = [];
   public listeners: ((topic: string, payload: Buffer) => void)[] = [];
 
   constructor() {}
+
+  public get lastPublish(): IPublishMock {
+    const n = this.publishes.length;
+    if (n === 0) {
+      throw new Error("No publishes found");
+    }
+    return this.publishes[n - 1];
+  }
 
   public publish(topic: string, payload: Buffer | string): void {
     this.publishes.push({ topic, payload: payload.toString() });
@@ -34,11 +47,13 @@ test("MqttClientMock initial state", () => {
 });
 
 test("MqttClientMock publish", () => {
+  expect(() => client.lastPublish).toThrow();
   client.publish("test1", "abc");
   expect(client.publishes).toHaveLength(1);
   client.publish("test2", "def");
   expect(client.publishes).toHaveLength(2);
   expect(client.publishes[1]).toEqual({ topic: "test2", payload: "def" });
+  expect(client.lastPublish).toEqual({ topic: "test2", payload: "def" });
 });
 
 test("MqttClientMock add subscription", () => {
