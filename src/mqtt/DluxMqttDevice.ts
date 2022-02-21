@@ -30,7 +30,7 @@ export class DluxMqttDevice {
   /**
    * Get online status for the device.
    */
-   public get status(): string {
+  public get status(): string {
     return this.m_status;
   }
   /**
