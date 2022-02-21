@@ -1,5 +1,5 @@
 import { DluxLedAction } from "../led/enums";
-import { DluxLedStatus, IScene } from "../led/interfaces";
+import { DluxLedState, IScene } from "../led/interfaces";
 import { Color } from "../led/types";
 import { DluxLedDevice } from "./DluxLedDevice";
 import { IDluxSubscription } from "./interfaces";
@@ -12,7 +12,7 @@ export class DluxLedMultiDevice extends DluxLedDevice {
     });
   }
 
-  public override get state(): DluxLedStatus {
+  public override get state(): DluxLedState {
     throw new Error(`DluxLedMultiDevice "${this.name}" does not have a state"`);
   }
 

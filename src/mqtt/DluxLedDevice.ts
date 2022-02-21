@@ -1,7 +1,7 @@
 import { status, encode, morse } from "../led/functions";
 import { DluxMqttDevice } from "./DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "../led/enums";
-import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
+import { DluxLedState, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
 import { Color, MS100, Swaps } from "../led/types";
 import { DluxEventCallbackSignature } from "./types";
 import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
@@ -9,7 +9,7 @@ import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
 export class DluxLedDevice extends DluxMqttDevice {
   public readonly rgbw: boolean;
 
-  private m_state: DluxLedStatus = {
+  private m_state: DluxLedState = {
     scene: DluxSceneType.ERROR,
     colorType: DluxColorType.ERROR,
     bufferSize: 0,
@@ -60,7 +60,7 @@ export class DluxLedDevice extends DluxMqttDevice {
   /**
    * Get the current state of the LED device.
    */
-  public get state(): DluxLedStatus {
+  public get state(): DluxLedState {
     return this.m_state;
   }
 

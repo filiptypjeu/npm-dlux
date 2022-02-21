@@ -1,6 +1,6 @@
 import { toMorse } from "./morse-dictionary";
 import { DluxColorType, DluxSceneType, DluxPredefinedColor } from "./enums";
-import { DluxLedStatus, IScene, ISceneChase, ISceneFlow, ISceneStatic, ISceneStrobe, ISceneSwap } from "./interfaces";
+import { DluxLedState, IScene, ISceneChase, ISceneFlow, ISceneStatic, ISceneStrobe, ISceneSwap } from "./interfaces";
 import { Color, MS100, RGBW, Swaps } from "./types";
 
 export const BLACK = (color: Color): Color => {
@@ -156,9 +156,9 @@ export const encode = <T extends Color>(scene?: IScene<T>): Buffer => {
 /**
  * Decode a dlux LED status string into a a human readable format.
  */
-export const status = (msg: string): DluxLedStatus => {
+export const status = (msg: string): DluxLedState => {
   const a = msg.trim().split(":");
-  const res: DluxLedStatus = {
+  const res: DluxLedState = {
     scene: Number(a[0]) in DluxSceneType ? (Number(a[0]) as DluxSceneType) : DluxSceneType.ERROR,
     colorType: Number(a[1]) in DluxColorType ? (Number(a[1]) as DluxColorType) : DluxColorType.ERROR,
     bufferSize: Number(a[2]) || 0,
@@ -280,7 +280,7 @@ export const colorToRGBW = (color: DluxPredefinedColor): RGBW => {
   }
 };
 
-export const statusToString = (status: DluxLedStatus): string => {
+export const stateToString = (status: DluxLedState): string => {
   if (status.color) {
     return `[${status.color.join(", ")}]`;
   }

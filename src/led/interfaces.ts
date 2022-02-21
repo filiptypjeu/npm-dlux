@@ -56,7 +56,7 @@ export interface ISceneChase<T extends Color> extends IScene<T> {
   comet?: boolean;
 }
 
-export interface DluxLedStatus {
+export interface DluxLedState {
   scene: DluxSceneType;
   colorType: DluxColorType;
   bufferSize: number;
