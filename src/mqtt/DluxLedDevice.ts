@@ -1,4 +1,4 @@
-import { status, encode, morse, statusToString } from "../led/functions";
+import { status, encode, morse } from "../led/functions";
 import { DluxMqttDevice } from "./DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "../led/enums";
 import { DluxLedStatus, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "../led/interfaces";
@@ -35,6 +35,12 @@ export class DluxLedDevice extends DluxMqttDevice {
   /**
    * Get the topic in which the device publishes its current state.
    */
+  public get on(): boolean {
+    return this.state.sceneOn && this.state.powerOn !== false;
+  }
+  /**
+   * Get the topic in which the device publishes its current state.
+   */
   public get statesTopic(): string {
     return this.topic + "/states";
   }
@@ -56,22 +62,6 @@ export class DluxLedDevice extends DluxMqttDevice {
    */
   public get state(): DluxLedStatus {
     return this.m_state;
-  }
-
-  public get statusString(): string {
-    let s = `${this.name} `;
-    if (!this.online) {
-      s += "is offline";
-    } else if (this.state.powerOn === false) {
-      s += "is powerless";
-    } else if (this.state.dataOn === false) {
-      s += "can not be controlled";
-    } else if (!this.state.sceneOn) {
-      s += "= BLACKOUT";
-    } else {
-      s += `= ${statusToString(this.state)}`;
-    }
-    return s;
   }
 
   protected override get deviceSubscriptions(): IDluxSubscription[] {

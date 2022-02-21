@@ -20,10 +20,6 @@ export class DluxLedMultiDevice extends DluxLedDevice {
     return this.devices.reduce<boolean>((res, d) => res || d.online, false);
   }
 
-  public override get statusString(): string {
-    return this.devices.map(d => d.statusString).join(", ");
-  }
-
   public override get subscriptions(): IDluxSubscription[] {
     return [];
   }
