@@ -28,10 +28,13 @@ test("mocked client inital listeners", () => {
 
 test("dlux mqtt device mocked status topic", () => {
   expect(d.online).toEqual(false);
+  expect(d.status).toEqual("offline");
   client.mock("dlux/l1/status", Buffer.from("online"));
   expect(d.online).toEqual(true);
+  expect(d.status).toEqual("online");
   client.mock("dlux/l1/status", Buffer.from("disconnected"));
   expect(d.online).toEqual(false);
+  expect(d.status).toEqual("disconnected");
 });
 
 test("dlux mqtt device mocked version topic", () => {

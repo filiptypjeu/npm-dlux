@@ -31,8 +31,13 @@ test("dlux mqtt device subscription topics", () => {
 
 test("dlux mqtt device status callback", () => {
   expect(d.online).toEqual(false);
+  expect(d.status).toEqual("offline");
   subs[0].callback(Buffer.from("online"));
   expect(d.online).toEqual(true);
+  expect(d.status).toEqual("online");
+  subs[0].callback(Buffer.from("disconnected"));
+  expect(d.online).toEqual(false);
+  expect(d.status).toEqual("disconnected");
 });
 
 test("dlux mqtt device version callback", () => {
