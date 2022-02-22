@@ -19,8 +19,8 @@ export class DluxMqttDevice {
   constructor(o: { name: string; topic: string; client?: IDluxMqttClient; eventCallback?: DluxEventCallbackSignature }) {
     this.name = o.name;
     this.m_topic = o.topic;
+    this.m_client = o.client;
     this.m_eventCallback = o.eventCallback;
-    if (o.client) this.initialize(o.client);
   }
 
   protected _publish(topic: string, buffer: Buffer | string) {
