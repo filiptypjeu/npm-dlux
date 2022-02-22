@@ -174,9 +174,12 @@ export class DluxMqttDevice {
    */
   public addListener(): this {
     this.client.addListener("message", (t: string, p: Buffer) => {
-      const sub = this.subscriptions.find(s => s.topic === t);
-      if (!sub) return;
-      sub.callback(p);
+      for (let i = 0; i < this.subscriptions.length; i++) {
+        const sub = this.subscriptions[i];
+        if (sub.topic === t) {
+          sub.callback(p);
+        }
+      }
     });
     return this;
   }
