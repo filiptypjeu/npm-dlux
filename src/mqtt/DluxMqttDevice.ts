@@ -1,5 +1,5 @@
 import { DluxEventSource } from "./enums";
-import { IDluxMqttClient, IDluxSubscription } from "./interfaces";
+import { IDluxMqttClient, IDluxSubscription, IDluxMqttClientExternalHandling, IDluxMqttClientInternalHandling } from "./interfaces";
 import { DluxEventCallbackSignature } from "./types";
 
 // XXX: Add HA support?
@@ -19,8 +19,10 @@ export class DluxMqttDevice {
   constructor(o: { name: string; topic: string; client?: IDluxMqttClient; eventCallback?: DluxEventCallbackSignature }) {
     this.name = o.name;
     this.m_topic = o.topic;
-    this.m_client = o.client;
     this.m_eventCallback = o.eventCallback;
+    if (o.client) {
+      this.initialize(o.client);
+    }
   }
 
   protected _publish(topic: string, buffer: Buffer | string) {
@@ -163,52 +165,34 @@ export class DluxMqttDevice {
   }
 
   /**
-   * Set the MQTT client for this implementation.
-   */
-  public set client(client: IDluxMqttClient) {
-    this.m_client = client;
-  }
-
-  /**
-   * Add a listener that calls the correct callback for subscriptions of this implementation.
-   */
-  public addListener(): this {
-    this.client.addListener("message", (t: string, p: Buffer) => {
-      for (let i = 0; i < this.subscriptions.length; i++) {
-        const sub = this.subscriptions[i];
-        if (sub.topic === t) {
-          sub.callback(p);
-        }
-      }
-    });
-    return this;
-  }
-
-  /**
-   * Subscribe to all device subtopics.
-   */
-  public subscribe(): this {
-    this.subscriptions.forEach(s => this.client.subscribe(s.topic));
-    return this;
-  }
-
-  /**
-   * Request states from the device.
-   */
-  public requestStates(): this {
-    // XXX: Legacy
-    this._publish(this.topic, "v"); // Version
-    return this;
-  }
-
-  /**
-   * Initialize this implementation fully (set client, add listeners, subscribe and request states).
+   * Initialize this implementation fully.
    */
   public initialize(client: IDluxMqttClient): this {
-    this.client = client;
-    this.addListener();
-    this.subscribe();
-    this.requestStates();
+    this.m_client = client;
+
+    if ((this.client as any).addSubscription) {
+      const client = this.client as IDluxMqttClientExternalHandling;
+
+      // Let the client handle all subscriptions and message callbacks
+      this.subscriptions.forEach(s => client.addSubscription(s.topic, s.callback));
+
+    } else {
+      const client = this.client as IDluxMqttClientInternalHandling;
+
+      // Add a separate listener for this device
+      client.addListener("message", (t: string, p: Buffer) => {
+        for (let i = 0; i < this.subscriptions.length; i++) {
+          const sub = this.subscriptions[i];
+          if (sub.topic === t) {
+            sub.callback(p);
+          }
+        }
+      });
+
+      // Subscribe to all topics
+      this.subscriptions.forEach(s => client.subscribe(s.topic));
+    }
+
     return this;
   }
 
