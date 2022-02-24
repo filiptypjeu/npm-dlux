@@ -69,12 +69,6 @@ export class DluxMqttDevice {
     return this.topic + "/version";
   }
   /**
-   * Get the topic in which the device publishes its log messages.
-   */
-  public get logTopic(): string {
-    return this.topic + "/log";
-  }
-  /**
    * Get the topic in which the device publishes its output states.
    */
   public get outputsTopic(): string {
@@ -106,15 +100,6 @@ export class DluxMqttDevice {
       {
         topic: this.versionTopic,
         callback: payload => (this.m_version = payload.toString()),
-      },
-      {
-        topic: this.logTopic,
-        // XXX: Legacy
-        callback: payload => {
-          const msg = payload.toString();
-          if (!msg.startsWith("Version = ")) return;
-          this.m_version = msg.split("Version = ")[1];
-        },
       },
       {
         topic: this.inputsTopic,

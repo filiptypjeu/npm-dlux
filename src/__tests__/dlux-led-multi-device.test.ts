@@ -10,7 +10,6 @@ test("dlux led multi device basic properties", () => {
   expect(() => d.topic).toThrow();
   expect(() => d.statusTopic).toThrow();
   expect(() => d.versionTopic).toThrow();
-  expect(() => d.logTopic).toThrow();
   expect(() => d.inputsTopic).toThrow();
   expect(() => d.outputsTopic).toThrow();
   expect(() => d.statesTopic).toThrow();

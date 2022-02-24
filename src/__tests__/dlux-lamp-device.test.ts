@@ -15,8 +15,8 @@ test("dlux lamp device basic properties", () => {
 const subs = d.subscriptions;
 
 test("dlux lamp device subscriptions", () => {
-  expect(subs).toHaveLength(6);
-  expect(subs[5].topic).toEqual("dlux/gt/lamps");
+  expect(subs).toHaveLength(5);
+  expect(subs[4].topic).toEqual("dlux/gt/lamps");
 });
 
 test("dlux lamp device default lamp states", () => {
@@ -24,6 +24,6 @@ test("dlux lamp device default lamp states", () => {
 });
 
 test("dlux lamp device lamp state callback", () => {
-  subs[5].callback(Buffer.from("10110010--------"));
+  subs[4].callback(Buffer.from("10110010--------"));
   expect(d.lamps).toEqual("10110010--------");
 });

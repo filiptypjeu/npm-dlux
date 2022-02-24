@@ -15,8 +15,8 @@ test("mocked client inital publishes", () => {
 });
 
 test("mocked client inital subscriptions", () => {
-  expect(client.subscriptions).toHaveLength(6);
-  expect(client.subscriptions).toEqual(["dlux/gt/status", "dlux/gt/version", "dlux/gt/log", "dlux/gt/inputs", "dlux/gt/outputs", "dlux/gt/lamps"]);
+  expect(client.subscriptions).toHaveLength(5);
+  expect(client.subscriptions).toEqual(["dlux/gt/status", "dlux/gt/version", "dlux/gt/inputs", "dlux/gt/outputs", "dlux/gt/lamps"]);
 });
 
 test("mocked client inital listeners", () => {
@@ -63,6 +63,6 @@ test("dlux lamp device mocked set lamps invalid indexes", () => {
 
 test("mocked client state after tests", () => {
   expect(client.publishes).toHaveLength(6);
-  expect(client.subscriptions).toHaveLength(6);
+  expect(client.subscriptions).toHaveLength(5);
   expect(client.listeners).toHaveLength(1);
 });

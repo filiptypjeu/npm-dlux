@@ -17,8 +17,8 @@ test("mocked client inital publishes", () => {
 });
 
 test("mocked client inital subscriptions", () => {
-  expect(client.subscriptions).toHaveLength(6);
-  expect(client.subscriptions).toEqual(["dlux/l1/status", "dlux/l1/version", "dlux/l1/log", "dlux/l1/inputs", "dlux/l1/outputs", "dlux/l1/events"]);
+  expect(client.subscriptions).toHaveLength(5);
+  expect(client.subscriptions).toEqual(["dlux/l1/status", "dlux/l1/version", "dlux/l1/inputs", "dlux/l1/outputs", "dlux/l1/events"]);
 });
 
 test("mocked client inital listeners", () => {
@@ -42,13 +42,6 @@ test("dlux mqtt device mocked version topic", () => {
   expect(d.version).toEqual("v.1.2");
   client.mock("dlux/l1/version", Buffer.from("v.1.3"));
   expect(d.version).toEqual("v.1.3");
-});
-
-test("dlux mqtt device mocked log topic", () => {
-  client.mock("dlux/l1/log", Buffer.from("Version = v.1.4"));
-  expect(d.version).toEqual("v.1.4");
-  client.mock("dlux/l1/log", Buffer.from("Version = v.1.5"));
-  expect(d.version).toEqual("v.1.5");
 });
 
 test("dlux mqtt device mocked inputs topic", () => {
@@ -106,6 +99,6 @@ test("dlux mqtt device mocked event", () => {
 
 test("mocked client state after tests", () => {
   expect(client.publishes).toHaveLength(0);
-  expect(client.subscriptions).toHaveLength(6);
+  expect(client.subscriptions).toHaveLength(5);
   expect(client.listeners).toHaveLength(1);
 });
