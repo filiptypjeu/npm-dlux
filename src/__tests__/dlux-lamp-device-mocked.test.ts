@@ -11,8 +11,7 @@ const d = new DluxLampDevice({
 d.initialize(client);
 
 test("mocked client inital publishes", () => {
-  expect(client.publishes).toHaveLength(1);
-  expect(client.publishes).toEqual([{ topic: "dlux/gt", payload: "v" }]);
+  expect(client.publishes).toHaveLength(0);
 });
 
 test("mocked client inital subscriptions", () => {
@@ -53,17 +52,17 @@ test("dlux lamp device mocked set lamps", () => {
 });
 
 test("dlux lamp device mocked set lamps invalid indexes", () => {
-  expect(client.publishes).toHaveLength(7);
+  expect(client.publishes).toHaveLength(6);
   d.setLamp({ index: -2, state: DluxLampCommand.ON });
   d.setLamps([
     { index: -2, state: DluxLampCommand.ON },
     { index: -3, state: DluxLampCommand.ON },
   ]);
-  expect(client.publishes).toHaveLength(7);
+  expect(client.publishes).toHaveLength(6);
 });
 
 test("mocked client state after tests", () => {
-  expect(client.publishes).toHaveLength(7);
+  expect(client.publishes).toHaveLength(6);
   expect(client.subscriptions).toHaveLength(6);
   expect(client.listeners).toHaveLength(1);
 });

@@ -9,12 +9,11 @@ const d = new DluxMqttDevice({
   name: "device",
   topic: "dlux/l1",
   eventCallback: (e: IDluxEvent) => events.push(e),
+  client
 });
-d.initialize(client);
 
 test("mocked client inital publishes", () => {
-  expect(client.publishes).toHaveLength(1);
-  expect(client.publishes).toEqual([{ topic: "dlux/l1", payload: "v" }]);
+  expect(client.publishes).toHaveLength(0);
 });
 
 test("mocked client inital subscriptions", () => {
@@ -106,7 +105,7 @@ test("dlux mqtt device mocked event", () => {
 });
 
 test("mocked client state after tests", () => {
-  expect(client.publishes).toHaveLength(1);
+  expect(client.publishes).toHaveLength(0);
   expect(client.subscriptions).toHaveLength(6);
   expect(client.listeners).toHaveLength(1);
 });

@@ -78,7 +78,4 @@ test("dlux mqtt device set outputs with callback", () => {
 
 test("dlux mqtt device throw when no client", () => {
   expect(() => d.client).toThrow();
-  expect(() => d.subscribe()).toThrow();
-  expect(() => d.requestStates()).toThrow();
-  expect(() => d.addListener()).toThrow();
 });
