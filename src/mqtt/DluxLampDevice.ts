@@ -11,7 +11,6 @@ export class DluxLampDevice extends DluxMqttDevice {
     // DluxMqttDevice
     name: string;
     topic: string;
-    ha?: boolean;
     client?: IDluxMqttClient;
     eventCallback?: DluxEventCallbackSignature;
   }) {
