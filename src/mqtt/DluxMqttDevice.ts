@@ -1,11 +1,12 @@
 import { DluxEventSource } from "./enums";
-import { IDluxMqttClient, IDluxSubscription, IDluxMqttClientExternalHandling, IDluxMqttClientInternalHandling } from "./interfaces";
+import { IDluxMqttClient, IDluxSubscription, IDluxMqttClientExternalHandling, IDluxMqttClientInternalHandling, IDluxLogger } from "./interfaces";
 import { DluxEventCallbackSignature } from "./types";
 
 // XXX: Add HA support?
 
 export class DluxMqttDevice {
   public readonly name: string;
+  public readonly logger: IDluxLogger | undefined;
 
   private readonly m_topic: string;
   private m_client: IDluxMqttClient | undefined;
@@ -16,8 +17,9 @@ export class DluxMqttDevice {
   protected m_outputs: string = "--------";
   public m_eventCallback: DluxEventCallbackSignature | undefined;
 
-  constructor(o: { name: string; topic: string; client?: IDluxMqttClient; eventCallback?: DluxEventCallbackSignature }) {
+  constructor(o: { name: string; topic: string; client?: IDluxMqttClient; eventCallback?: DluxEventCallbackSignature, logger?: IDluxLogger }) {
     this.name = o.name;
+    this.logger = o.logger;
     this.m_topic = o.topic;
     this.m_eventCallback = o.eventCallback;
     if (o.client) {
@@ -27,6 +29,11 @@ export class DluxMqttDevice {
 
   protected _publish(topic: string, buffer: Buffer | string) {
     this.client.publish(topic, buffer);
+  }
+
+  protected _fatal(msg: string) {
+    this.logger?.fatal(msg);
+    throw new Error(msg);
   }
 
   /**
@@ -52,7 +59,7 @@ export class DluxMqttDevice {
    */
   public get topic(): string {
     if (!this.m_topic) {
-      throw new Error(`DluxMqttDevice "${this.name}" does not have a topic"`);
+      throw this._fatal(`DluxMqttDevice "${this.name}" does not have a topic"`);
     }
     return this.m_topic;
   }
@@ -144,7 +151,7 @@ export class DluxMqttDevice {
    */
   public get client(): IDluxMqttClient {
     if (!this.m_client) {
-      throw new Error(`DluxMqttDevice "${this.name}" does not have an MQTT client"`);
+      throw this._fatal(`DluxMqttDevice "${this.name}" does not have an MQTT client"`);
     }
     return this.m_client;
   }

@@ -20,6 +20,13 @@ export interface IDluxMqttClientExternalHandling extends IClientBase {
 
 export type IDluxMqttClient = IDluxMqttClientInternalHandling | IDluxMqttClientExternalHandling;
 
+export interface IDluxLogger {
+  info: (msg: any) => void;
+  warn: (msg: any) => void;
+  error: (msg: any) => void;
+  fatal: (msg: any) => void;
+}
+
 export interface IDluxEvent {
   source: DluxEventSource;
   n: number;
