@@ -25,7 +25,7 @@ export class DluxTempiraturDevice extends DluxMqttDevice {
   /**
    * Get the topic in which the device publishes the temperatures.
    */
-   public get temperaturesTopic(): string {
+  public get temperaturesTopic(): string {
     return this.topic + "/temps";
   }
   /**
@@ -47,7 +47,7 @@ export class DluxTempiraturDevice extends DluxMqttDevice {
   public get average(): number | null {
     let n = 0;
     let sum = 0;
-    for (let temp of this.m_temps) {
+    for (const temp of this.m_temps) {
       if (temp !== null) {
         n++;
         sum += temp;

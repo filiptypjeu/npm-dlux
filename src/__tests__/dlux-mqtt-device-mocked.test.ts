@@ -9,7 +9,7 @@ const d = new DluxMqttDevice({
   name: "device",
   topic: "dlux/l1",
   eventCallback: (e: IDluxEvent) => events.push(e),
-  client
+  client,
 });
 
 test("mocked client inital publishes", () => {

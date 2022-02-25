@@ -17,7 +17,7 @@ export class DluxMqttDevice {
   protected m_outputs: string = "--------";
   public m_eventCallback: DluxEventCallbackSignature | undefined;
 
-  constructor(o: { name: string; topic: string; client?: IDluxMqttClient; eventCallback?: DluxEventCallbackSignature, logger?: IDluxLogger }) {
+  constructor(o: { name: string; topic: string; client?: IDluxMqttClient; eventCallback?: DluxEventCallbackSignature; logger?: IDluxLogger }) {
     this.name = o.name;
     this.logger = o.logger;
     this.m_topic = o.topic;
@@ -162,12 +162,11 @@ export class DluxMqttDevice {
   public initialize(client: IDluxMqttClient): this {
     this.m_client = client;
 
-    if ((this.client as any).addSubscription) {
+    if ((this.client as IDluxMqttClientExternalHandling).addSubscription) {
       const client = this.client as IDluxMqttClientExternalHandling;
 
       // Let the client handle all subscriptions and message callbacks
       this.subscriptions.forEach(s => client.addSubscription(s.topic, s.callback));
-
     } else {
       const client = this.client as IDluxMqttClientInternalHandling;
 
