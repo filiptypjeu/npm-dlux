@@ -1,7 +1,5 @@
-import { DluxEventSource } from "./enums";
-import { IDluxSubscription, IDluxLogger } from "./interfaces";
 import { MqttDevice } from "./MqttDevice";
-import { DluxEventCallbackSignature } from "./types";
+import { DluxEventSource, IDluxSubscription, IDluxLogger, DluxEventCallbackSignature } from "./types";
 
 // XXX: Add HA support?
 

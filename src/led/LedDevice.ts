@@ -3,8 +3,7 @@ import { DluxMqttDevice } from "../mqtt/DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "./enums";
 import { DluxLedState, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "./interfaces";
 import { Color, MS100, Swaps } from "./types";
-import { DluxEventCallbackSignature } from "../mqtt/types";
-import { IDluxSubscription, IDluxLogger } from "../mqtt/interfaces";
+import { DluxEventCallbackSignature, IDluxSubscription, IDluxLogger } from "../mqtt/types";
 
 export class DluxLedDevice extends DluxMqttDevice {
   public readonly rgbw: boolean;

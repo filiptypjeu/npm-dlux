@@ -1,8 +1,7 @@
 import { DluxLampCommand } from "./enums";
 import { DluxLamp } from "./interfaces";
 import { DluxMqttDevice } from "../mqtt/DluxMqttDevice";
-import { IDluxSubscription, IDluxLogger } from "../mqtt/interfaces";
-import { DluxEventCallbackSignature } from "../mqtt/types";
+import { IDluxSubscription, IDluxLogger, DluxEventCallbackSignature } from "../mqtt/types";
 
 export class DluxLampDevice extends DluxMqttDevice {
   private m_lamps: string = "";

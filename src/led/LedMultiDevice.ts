@@ -2,7 +2,7 @@ import { DluxLedAction } from "./enums";
 import { DluxLedState, IScene } from "./interfaces";
 import { Color } from "./types";
 import { DluxLedDevice } from "./LedDevice";
-import { IDluxSubscription } from "../mqtt/interfaces";
+import { IDluxSubscription } from "../mqtt/types";
 
 export class DluxLedMultiDevice extends DluxLedDevice {
   constructor(name: string, public readonly devices: DluxLedDevice[]) {

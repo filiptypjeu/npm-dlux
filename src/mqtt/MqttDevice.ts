@@ -1,4 +1,4 @@
-import { IDluxMqttClient, IDluxSubscription, IDluxMqttClientExternalHandling, IDluxLogger } from "./interfaces";
+import { IDluxMqttClient, IDluxSubscription, IDluxMqttClientExternalHandling, IDluxLogger } from "./types";
 
 // XXX: Add HA support?
 
