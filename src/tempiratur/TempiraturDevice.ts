@@ -1,6 +1,6 @@
-import { DluxMqttDevice } from "./DluxMqttDevice";
-import { DluxEventCallbackSignature } from "./types";
-import { IDluxSubscription, IDluxLogger } from "./interfaces";
+import { DluxMqttDevice } from "../mqtt/DluxMqttDevice";
+import { DluxEventCallbackSignature } from "../mqtt/types";
+import { IDluxSubscription, IDluxLogger } from "../mqtt/interfaces";
 
 export class DluxTempiraturDevice extends DluxMqttDevice {
   public order: string[] | undefined;
