@@ -94,12 +94,14 @@ export class DluxMqttDevice {
     return this.topic + "/events";
   }
 
-  protected get commonSubscriptions(): IDluxSubscription[] {
+  protected override deviceSubscriptions(): IDluxSubscription[] {
+    let subs = super.deviceSubscriptions();
+
     if (!this.m_topic) {
-      return [];
+      return subs;
     }
 
-    const subs: IDluxSubscription[] = [
+    subs = subs.concat([
       {
         topic: this.statusTopic,
         callback: payload => (this.m_status = payload.toString()),
@@ -116,7 +118,7 @@ export class DluxMqttDevice {
         topic: this.outputsTopic,
         callback: payload => (this.m_outputs = payload.toString()),
       },
-    ];
+    ]);
 
     if (this.m_eventCallback) {
       subs.push({

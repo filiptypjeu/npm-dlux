@@ -37,13 +37,13 @@ export class DluxLampDevice extends DluxMqttDevice {
     return this.m_lamps;
   }
 
-  protected override get deviceSubscriptions(): IDluxSubscription[] {
-    return [
+  protected override deviceSubscriptions(): IDluxSubscription[] {
+    return super.deviceSubscriptions().concat([
       {
         topic: this.lampsTopic,
         callback: msg => (this.m_lamps = msg.toString()),
       },
-    ];
+    ]);
   }
 
   public setLamp(lamp: DluxLamp): void {

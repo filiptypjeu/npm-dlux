@@ -55,13 +55,13 @@ export class DluxTempiraturDevice extends DluxMqttDevice {
     return n > 0 ? Math.round((100 * sum) / n) / 100 : null;
   }
 
-  protected override get deviceSubscriptions(): IDluxSubscription[] {
-    return [
+  protected override deviceSubscriptions(): IDluxSubscription[] {
+    return super.deviceSubscriptions().concat([
       {
         topic: this.temperaturesTopic,
         callback: msg => this.parseTemperatureMessage(msg),
       },
-    ];
+    ]);
   }
 
   private parseTemperatureMessage(payload: Buffer) {

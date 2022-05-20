@@ -64,13 +64,13 @@ export class DluxLedDevice extends DluxMqttDevice {
     return this.m_state;
   }
 
-  protected override get deviceSubscriptions(): IDluxSubscription[] {
-    return [
+  protected override deviceSubscriptions(): IDluxSubscription[] {
+    return super.deviceSubscriptions().concat([
       {
         topic: this.statesTopic,
         callback: msg => (this.m_state = status(msg.toString())),
       },
-    ];
+    ]);
   }
 
   private isBufferUpToDate(): boolean {
