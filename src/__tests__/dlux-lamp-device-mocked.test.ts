@@ -1,6 +1,6 @@
 import { DluxLampDevice } from "../index";
 import { DluxLampCommand } from "../lamp/enums";
-import { MqttClientMock } from "./MqttClientMock.test";
+import MqttClientMock from "./MqttClientMock.test";
 
 const client = new MqttClientMock();
 

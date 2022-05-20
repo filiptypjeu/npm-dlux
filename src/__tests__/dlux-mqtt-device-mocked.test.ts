@@ -1,5 +1,5 @@
 import { DluxEventSource, DluxMqttDevice, IDluxEvent } from "../index";
-import { MqttClientMock } from "./MqttClientMock.test";
+import MqttClientMock from "./MqttClientMock.test";
 
 const client = new MqttClientMock();
 

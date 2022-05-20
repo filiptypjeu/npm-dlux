@@ -1,11 +1,11 @@
 import { IDluxMqttClientInternalHandling } from "../index";
 
-export interface IPublishMock {
+interface IPublishMock {
   topic: string;
   payload: string;
 }
 
-export class MqttClientMock implements IDluxMqttClientInternalHandling {
+class MqttClientMock implements IDluxMqttClientInternalHandling {
   public publishes: IPublishMock[] = [];
   public subscriptions: string[] = [];
   public listeners: ((topic: string, payload: Buffer) => void)[] = [];
@@ -36,6 +36,8 @@ export class MqttClientMock implements IDluxMqttClientInternalHandling {
     this.listeners.forEach(c => c(topic, payload));
   }
 }
+
+export default MqttClientMock;
 
 const client = new MqttClientMock();
 
