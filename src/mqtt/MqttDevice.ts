@@ -11,11 +11,7 @@ export abstract class MqttDevice {
 
   protected m_status: string = "offline";
 
-  constructor(o: {
-    name: string;
-    topic: string;
-    logger?: IDluxLogger;
-  }) {
+  constructor(o: { name: string; topic: string; logger?: IDluxLogger }) {
     this.name = o.name;
     this.logger = o.logger;
     this.m_topic = o.topic;
@@ -40,7 +36,9 @@ export abstract class MqttDevice {
     return this.m_topic;
   }
 
-  protected deviceSubscriptions(): IDluxSubscription[] { return [] };
+  protected deviceSubscriptions(): IDluxSubscription[] {
+    return [];
+  }
 
   /**
    * Get all the subscriptions for this implementation.
@@ -62,7 +60,7 @@ export abstract class MqttDevice {
   /**
    * Initialize this implementation fully.
    *
-   * The user need to call this manually after creating the device. We can not call this in the constructor since child subscriptions migth not be fully ready yet. 
+   * The user need to call this manually after creating the device. We can not call this in the constructor since child subscriptions migth not be fully ready yet.
    */
   public initialize(client: IDluxMqttClient): this {
     this.m_client = client;
@@ -73,7 +71,6 @@ export abstract class MqttDevice {
     if (isExtrnal(client)) {
       // Let the client handle all subscriptions and message callbacks
       subs.forEach(s => client.addSubscription(s.topic, s.callback));
-
     } else {
       // Add a separate listener for this device
       client.addListener("message", (t: string, p: Buffer) => {
