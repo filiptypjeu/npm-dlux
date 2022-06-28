@@ -11,24 +11,24 @@ interface Callbacks {
   outputs?: (newOutputs: DluxOutput[]) => void;
   events?: (event: IDluxEvent) => void;
 }
-interface Options extends BaseOptions {
-  topic: string,
-  callbacks?: Callbacks,
+interface Options<C> extends BaseOptions {
+  topic: string;
+  callbacks?: C;
 }
 
 export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice {
   public readonly topic: string;
-  public inputs: DluxInput[] = new Array(INPUTS).fill(undefined); // XXX: Change to dynamic size?
-  public outputs: DluxOutput[] = new Array(OUTPUTS).fill(undefined); // XXX: Change to dynamic size?
+  public inputs: DluxInput[] = (new Array(INPUTS) as DluxInput[]).fill(undefined); // XXX: Change to dynamic size?
+  public outputs: DluxOutput[] = (new Array(OUTPUTS) as DluxOutput[]).fill(undefined); // XXX: Change to dynamic size?
   public status: string = "offline"; // XXX: Enum?
   public version: string = "";
 
   protected m_callbacks: C;
 
-  constructor(o: Options) {
+  constructor(o: Options<C>) {
     super({ ...o });
     this.topic = o.topic;
-    this.m_callbacks = o.callbacks as any || {};
+    this.m_callbacks = o.callbacks || ({} as C);
   }
 
   public get online(): boolean {
@@ -64,17 +64,18 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
         },
       },
     ]);
-  
+
     if (this.m_callbacks.events) {
       subs.push({
         topic: this.topic + "/events",
         callback: payload => {
           const a = payload.toString().split(":");
-          if (this.m_callbacks.events) this.m_callbacks.events({
-            source: a[0] as DluxEventSource,
-            n: Number(a[1]),
-            value: Number(a[2]),
-          });
+          if (this.m_callbacks.events)
+            this.m_callbacks.events({
+              source: a[0] as DluxEventSource,
+              n: Number(a[1]),
+              value: Number(a[2]),
+            });
         },
       });
     }
@@ -83,14 +84,22 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
   }
 
   private parseInputs(payload: Buffer): void {
-    const a = payload.toString().split(":").slice(0, 8).map(str => DluxMqttDevice.stringToValue(str));
+    const a = payload
+      .toString()
+      .split(":")
+      .slice(0, 8)
+      .map(str => DluxMqttDevice.stringToValue(str));
     for (let i = 0; i < INPUTS; i++) {
       this.inputs[i] = a[i];
     }
   }
 
   private parseOutputs(payload: Buffer): void {
-    const a = payload.toString().split("").slice(0, 8).map(str => DluxMqttDevice.stringToBool(str));
+    const a = payload
+      .toString()
+      .split("")
+      .slice(0, 8)
+      .map(str => DluxMqttDevice.stringToBool(str));
     for (let i = 0; i < OUTPUTS; i++) {
       this.outputs[i] = a[i];
     }

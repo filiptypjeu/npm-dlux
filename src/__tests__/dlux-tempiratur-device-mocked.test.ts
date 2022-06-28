@@ -12,7 +12,7 @@ const d = new DluxTempiraturDevice({
   callbacks: {
     temperatures: tMock.mock,
     text: xMock.mock,
-  }
+  },
 });
 d.initialize(client);
 

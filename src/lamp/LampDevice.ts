@@ -6,7 +6,7 @@ import { IDluxSubscription } from "../mqtt/types";
 type BaseOptions = ConstructorParameters<typeof DluxMqttDevice>[0];
 interface Callbacks extends NonNullable<BaseOptions["callbacks"]> {
   lamps?: (newLamps: string) => void;
-};
+}
 interface Options extends BaseOptions {
   callbacks?: Callbacks;
 }

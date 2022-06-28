@@ -16,7 +16,7 @@ class CallbackMock {
   public get mock(): Callback {
     return (...args: any[]) => {
       this.calls.push(args);
-    }
+    };
   }
 }
 

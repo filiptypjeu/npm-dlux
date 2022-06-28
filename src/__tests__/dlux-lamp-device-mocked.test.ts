@@ -10,7 +10,7 @@ const d = new DluxLampDevice({
   topic: "dlux/gt",
   callbacks: {
     lamps: lMock.mock,
-  }
+  },
 });
 d.initialize(client);
 

@@ -8,7 +8,7 @@ import { IDluxSubscription } from "../mqtt/types";
 type BaseOptions = ConstructorParameters<typeof DluxMqttDevice>[0];
 interface Callbacks extends NonNullable<BaseOptions["callbacks"]> {
   state?: (newState: DluxLedState) => void;
-};
+}
 interface Options extends BaseOptions {
   rgbw?: boolean;
   callbacks?: Callbacks;

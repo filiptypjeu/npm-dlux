@@ -16,7 +16,7 @@ const d = new DluxMqttDevice({
     inputs: iMock.mock,
     outputs: oMock.mock,
     events: eMock.mock,
-  }
+  },
 }).initialize(client);
 
 test("mocked client inital publishes", () => {
@@ -42,10 +42,7 @@ test("dlux mqtt device mocked status topic", () => {
   client.mock("dlux/l1/status", Buffer.from("disconnected"));
   expect(d.online).toEqual(false);
   expect(d.status).toEqual("disconnected");
-  expect(sMock.calls).toEqual([
-    ["online"],
-    ["disconnected"],
-  ]);
+  expect(sMock.calls).toEqual([["online"], ["disconnected"]]);
 });
 
 test("dlux mqtt device mocked version topic", () => {
@@ -78,21 +75,27 @@ test("dlux mqtt device mocked event", () => {
   client.mock("dlux/l1/events", Buffer.from("I:5:0"));
   client.mock("dlux/l1/events", Buffer.from("a:a:a:a"));
   expect(eMock.calls).toEqual([
-    [{
-      source: DluxEventSource.DLUX_BUTTON,
-      n: 13,
-      value: 1,
-    }],
-    [{
-      source: DluxEventSource.GPIO_INPUT,
-      n: 5,
-      value: 0,
-    }],
-    [{
-      source: "a",
-      n: NaN,
-      value: NaN,
-    }],
+    [
+      {
+        source: DluxEventSource.DLUX_BUTTON,
+        n: 13,
+        value: 1,
+      },
+    ],
+    [
+      {
+        source: DluxEventSource.GPIO_INPUT,
+        n: 5,
+        value: 0,
+      },
+    ],
+    [
+      {
+        source: "a",
+        n: NaN,
+        value: NaN,
+      },
+    ],
   ]);
 });
 
