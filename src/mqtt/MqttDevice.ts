@@ -70,6 +70,8 @@ export abstract class MqttDevice {
       subs.forEach(s => client.subscribe(s.topic));
     }
 
+    this.logger?.info(`MqttDevice ${this.name} initialized`);
+
     return this;
   }
 

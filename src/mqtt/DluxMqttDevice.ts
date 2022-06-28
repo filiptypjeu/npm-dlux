@@ -36,9 +36,7 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
   }
 
   protected override deviceSubscriptions(): IDluxSubscription[] {
-    let subs = super.deviceSubscriptions();
-
-    subs = subs.concat([
+    const subs = super.deviceSubscriptions().concat([
       {
         topic: this.topic + "/status",
         callback: payload => {
@@ -49,7 +47,7 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
       },
       {
         topic: this.topic + "/version",
-        callback: payload => (this.m_version = payload.toString()),
+        callback: payload => (this.version = payload.toString()),
       },
       {
         topic: this.topic + "/inputs",
@@ -104,19 +102,5 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
 
   private static stringToValue(str: string): number | boolean | undefined {
     return str.length === 3 ? Number(str) : DluxMqttDevice.stringToBool(str);
-  }
-
-  /**
-   * Get the input states of the device.
-   */
-  public get inputs(): (number | boolean | undefined)[] {
-    return this.m_inputs.split(":").map(str => DluxMqttDevice.stringToValue(str));
-  }
-
-  /**
-   * Get the output states of the device.
-   */
-  public get outputs(): (boolean | undefined)[] {
-    return this.m_outputs.split("").map(str => DluxMqttDevice.stringToBool(str));
   }
 }

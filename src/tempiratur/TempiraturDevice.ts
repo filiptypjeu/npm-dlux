@@ -84,6 +84,6 @@ export class DluxTempiraturDevice extends DluxMqttDevice<Callbacks> {
   }
 
   public print(row: number, text: string): void {
-    this._publish(`${this.textTopic}/${row}`, text);
+    this._publish(`t/${row}`, text);
   }
 }
