@@ -1,11 +1,13 @@
 import { MqttDevice } from "./MqttDevice";
 import { DluxEventSource, IDluxSubscription, IDluxLogger, DluxEventCallbackSignature } from "./types";
 
-// XXX: Add HA support?
+const INPUTS = 8;
+const OUTPUTS = 8;
 
 export class DluxMqttDevice extends MqttDevice {
   public readonly topic: string;
-
+  public inputs: DluxInput[] = new Array(INPUTS).fill(undefined); // XXX: Change to dynamic size?
+  public outputs: DluxOutput[] = new Array(OUTPUTS).fill(undefined); // XXX: Change to dynamic size?
   public status: string = "offline"; // XXX: Enum?
   public version: string = "";
 
@@ -41,11 +43,15 @@ export class DluxMqttDevice extends MqttDevice {
       },
       {
         topic: this.topic + "/inputs",
-        callback: payload => (this.m_inputs = payload.toString()),
+        callback: payload => {
+          this.parseInputs(payload);
+        },
       },
       {
         topic: this.topic + "/outputs",
-        callback: payload => (this.m_outputs = payload.toString()),
+        callback: payload => {
+          this.parseOutputs(payload);
+        },
       },
     ]);
 
@@ -64,6 +70,20 @@ export class DluxMqttDevice extends MqttDevice {
     }
 
     return subs;
+  }
+
+  private parseInputs(payload: Buffer): void {
+    const a = payload.toString().split(":").slice(0, 8).map(str => DluxMqttDevice.stringToValue(str));
+    for (let i = 0; i < INPUTS; i++) {
+      this.inputs[i] = a[i];
+    }
+  }
+
+  private parseOutputs(payload: Buffer): void {
+    const a = payload.toString().split("").slice(0, 8).map(str => DluxMqttDevice.stringToBool(str));
+    for (let i = 0; i < OUTPUTS; i++) {
+      this.outputs[i] = a[i];
+    }
   }
 
   private static stringToBool(str: string): boolean | undefined {

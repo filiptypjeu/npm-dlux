@@ -53,19 +53,21 @@ test("dlux mqtt device default outputs", () => {
 });
 
 test("dlux mqtt device set inputs with callback", () => {
-  subs[2].callback(Buffer.from(":-:asd:042:42:1:999:0:1"));
+  // Give 9 values
+  subs[2].callback(Buffer.from(":-:asd:042:42:1:999:0:1"), "");
   const inputs = d.inputs;
 
-  expect(inputs).toHaveLength(9);
-  expect(inputs).toEqual([undefined, undefined, NaN, 42, undefined, true, 999, false, true]);
+  expect(inputs).toHaveLength(8);
+  expect(inputs).toEqual([undefined, undefined, NaN, 42, undefined, true, 999, false]);
 });
 
 test("dlux mqtt device set outputs with callback", () => {
-  subs[3].callback(Buffer.from("-a011-?01"));
+  // Give 9 values
+  subs[3].callback(Buffer.from("-a011-?01"), "");
   const outputs = d.outputs;
 
-  expect(outputs).toHaveLength(9);
-  expect(outputs).toEqual([undefined, undefined, false, true, true, undefined, undefined, false, true]);
+  expect(outputs).toHaveLength(8);
+  expect(outputs).toEqual([undefined, undefined, false, true, true, undefined, undefined, false]);
 });
 
 test("dlux mqtt device throw when no client", () => {
