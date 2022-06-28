@@ -2,6 +2,7 @@ import { toMorse } from "./morse-dictionary";
 import { DluxColorType, DluxSceneType, DluxPredefinedColor } from "./enums";
 import { DluxLedState, IScene, ISceneChase, ISceneFlow, ISceneStatic, ISceneStrobe, ISceneSwap } from "./interfaces";
 import { Color, MS100, RGBW, Swaps } from "./types";
+import { DluxLedDevice } from "./LedDevice";
 
 export const BLACK = (color: Color): Color => {
   if (!Array.isArray(color)) {
@@ -298,4 +299,20 @@ export const stateToString = (status: DluxLedState): string => {
     default:
       return "ERROR";
   }
+};
+
+export const deviceToString = (d: DluxLedDevice): string => {
+  let s = `${d.name} `;
+  if (!d.online) {
+    s += "is offline";
+  } else if (d.state.powerOn === false) {
+    s += "is powerless";
+  } else if (d.state.dataOn === false) {
+    s += "can not be controlled";
+  } else if (!d.state.sceneOn) {
+    s += "= BLACKOUT";
+  } else {
+    s += `= ${stateToString(d.state)}`;
+  }
+  return s;
 };

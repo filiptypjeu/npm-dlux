@@ -1,5 +1,5 @@
 import { DluxLedAction } from "./enums";
-import { DluxLedState, IScene } from "./interfaces";
+import { IScene } from "./interfaces";
 import { Color } from "./types";
 import { DluxLedDevice } from "./LedDevice";
 import { IDluxSubscription } from "../mqtt/types";
@@ -12,10 +12,6 @@ export class DluxLedMultiDevice extends DluxLedDevice {
     });
   }
 
-  public override get state(): DluxLedState {
-    throw new Error(`DluxLedMultiDevice "${this.name}" does not have a state"`);
-  }
-
   public override get online(): boolean {
     return this.devices.reduce<boolean>((res, d) => res || d.online, false);
   }
@@ -24,9 +20,10 @@ export class DluxLedMultiDevice extends DluxLedDevice {
     return [];
   }
 
-  public override initialize(): this {
+  public override initialize(..._agrs: any[]): this {
     return this;
   }
+
   public override scene<C extends Color>(scene: IScene<C> | Buffer): void {
     this.devices.forEach(d => d.scene(scene));
   }
@@ -35,7 +32,7 @@ export class DluxLedMultiDevice extends DluxLedDevice {
     this.devices.forEach(d => d.action(a));
   }
 
-  public override copyTo(): void {
+  public override copyTo(..._agrs: any[]): void {
     return;
   }
 }
