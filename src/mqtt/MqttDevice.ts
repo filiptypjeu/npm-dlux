@@ -76,8 +76,8 @@ export abstract class MqttDevice {
       client.addListener("message", (t: string, p: Buffer) => {
         for (let i = 0; i < subs.length; i++) {
           const sub = subs[i];
-          if (sub.topic === t) {
-            sub.callback(p);
+          if (MqttDevice.matchTopic(sub.topic, t)) {
+            sub.callback(p, t);
           }
         }
       });
@@ -87,5 +87,20 @@ export abstract class MqttDevice {
     }
 
     return this;
+  }
+
+  private static matchTopic(filter: string, topic: string): boolean {
+    const filterArray = filter.split("/");
+    const length = filterArray.length;
+    const topicArray = topic.split("/");
+
+    for (let i = 0; i < length; ++i) {
+      const left = filterArray[i];
+      const right = topicArray[i];
+      if (left === "#") return topicArray.length >= length - 1;
+      if (left !== "+" && left !== right) return false;
+    }
+
+    return length === topicArray.length;
   }
 }
