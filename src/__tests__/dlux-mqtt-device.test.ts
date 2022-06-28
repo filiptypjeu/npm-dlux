@@ -1,4 +1,5 @@
 import { DluxMqttDevice } from "../index";
+import { TOPICS_DLUX } from "./VARS";
 
 const d = new DluxMqttDevice({
   name: "device",
@@ -13,7 +14,7 @@ test("dlux mqtt device basic properties", () => {
 const subs = d.subscriptions;
 
 test("dlux mqtt device subscriptions", () => {
-  expect(subs).toHaveLength(4);
+  expect(subs).toHaveLength(TOPICS_DLUX);
 });
 
 test("dlux mqtt device subscription topics", () => {

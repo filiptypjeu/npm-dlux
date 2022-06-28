@@ -1,4 +1,5 @@
 import { DluxLampDevice } from "../index";
+import { TOPICS_DLUX } from "./VARS";
 
 const d = new DluxLampDevice({
   name: "gatan",
@@ -13,8 +14,8 @@ test("dlux lamp device basic properties", () => {
 const subs = d.subscriptions;
 
 test("dlux lamp device subscriptions", () => {
-  expect(subs).toHaveLength(5);
-  expect(subs[4].topic).toEqual("dlux/gt/lamps");
+  expect(subs).toHaveLength(TOPICS_DLUX + 1);
+  expect(subs[TOPICS_DLUX].topic).toEqual("dlux/gt/lamps");
 });
 
 test("dlux lamp device default lamp states", () => {
@@ -22,6 +23,6 @@ test("dlux lamp device default lamp states", () => {
 });
 
 test("dlux lamp device lamp state callback", () => {
-  subs[4].callback(Buffer.from("10110010--------"), "");
+  subs[TOPICS_DLUX].callback(Buffer.from("10110010--------"), "");
   expect(d.lamps).toEqual("10110010--------");
 });
