@@ -1,18 +1,20 @@
 import { DluxLampCommand } from "./enums";
 import { DluxLamp } from "./interfaces";
 import { DluxMqttDevice } from "../mqtt/DluxMqttDevice";
-import { IDluxSubscription, IDluxLogger, DluxEventCallbackSignature } from "../mqtt/types";
+import { IDluxSubscription } from "../mqtt/types";
 
-export class DluxLampDevice extends DluxMqttDevice {
-  private m_lamps: string = "";
+type BaseOptions = ConstructorParameters<typeof DluxMqttDevice>[0];
+interface Callbacks extends NonNullable<BaseOptions["callbacks"]> {
+  lamps?: (newLamps: string) => void;
+};
+interface Options extends BaseOptions {
+  callbacks?: Callbacks;
+}
 
-  constructor(o: {
-    // DluxMqttDevice
-    name: string;
-    topic: string;
-    eventCallback?: DluxEventCallbackSignature;
-    logger?: IDluxLogger;
-  }) {
+export class DluxLampDevice extends DluxMqttDevice<Callbacks> {
+  public lamps: string = "";
+
+  constructor(o: Options) {
     super(o);
   }
 
@@ -20,7 +22,10 @@ export class DluxLampDevice extends DluxMqttDevice {
     return super.deviceSubscriptions().concat([
       {
         topic: this.topic + "/lamps",
-        callback: msg => (this.m_lamps = msg.toString()),
+        callback: msg => {
+          this.lamps = msg.toString();
+          if (this.m_callbacks.lamps) this.m_callbacks.lamps(this.lamps);
+        },
       },
     ]);
   }

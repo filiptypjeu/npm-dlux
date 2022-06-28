@@ -1,28 +1,34 @@
 import { MqttDevice } from "./MqttDevice";
-import { DluxEventSource, IDluxSubscription, IDluxLogger, DluxEventCallbackSignature } from "./types";
+import { DluxEventSource, IDluxSubscription, IDluxEvent, DluxInput, DluxOutput } from "./types";
 
 const INPUTS = 8;
 const OUTPUTS = 8;
 
-export class DluxMqttDevice extends MqttDevice {
+type BaseOptions = Omit<ConstructorParameters<typeof MqttDevice>[0], "statusTopic" | "statusCallback">;
+interface Callbacks {
+  status?: (newStatus: string) => void;
+  inputs?: (newInputs: DluxInput[]) => void;
+  outputs?: (newOutputs: DluxOutput[]) => void;
+  events?: (event: IDluxEvent) => void;
+}
+interface Options extends BaseOptions {
+  topic: string,
+  callbacks?: Callbacks,
+}
+
+export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice {
   public readonly topic: string;
   public inputs: DluxInput[] = new Array(INPUTS).fill(undefined); // XXX: Change to dynamic size?
   public outputs: DluxOutput[] = new Array(OUTPUTS).fill(undefined); // XXX: Change to dynamic size?
   public status: string = "offline"; // XXX: Enum?
   public version: string = "";
 
-  constructor(o: {
-    // MqttDevice
-    name: string;
-    topic: string;
-    logger?: IDluxLogger;
+  protected m_callbacks: C;
 
-    // Own
-    eventCallback?: DluxEventCallbackSignature;
-  }) {
-    super(o);
+  constructor(o: Options) {
+    super({ ...o });
     this.topic = o.topic;
-    this.m_eventCallback = o.eventCallback;
+    this.m_callbacks = o.callbacks as any || {};
   }
 
   public get online(): boolean {
@@ -35,7 +41,11 @@ export class DluxMqttDevice extends MqttDevice {
     subs = subs.concat([
       {
         topic: this.topic + "/status",
-        callback: payload => (this.m_status = payload.toString()),
+        callback: payload => {
+          const s = payload.toString();
+          this.status = s;
+          if (this.m_callbacks.status) this.m_callbacks.status(s);
+        },
       },
       {
         topic: this.topic + "/version",
@@ -45,22 +55,24 @@ export class DluxMqttDevice extends MqttDevice {
         topic: this.topic + "/inputs",
         callback: payload => {
           this.parseInputs(payload);
+          if (this.m_callbacks.inputs) this.m_callbacks.inputs(this.inputs);
         },
       },
       {
         topic: this.topic + "/outputs",
         callback: payload => {
           this.parseOutputs(payload);
+          if (this.m_callbacks.outputs) this.m_callbacks.outputs(this.outputs);
         },
       },
     ]);
-
-    if (this.m_eventCallback) {
+  
+    if (this.m_callbacks.events) {
       subs.push({
         topic: this.topic + "/events",
         callback: payload => {
           const a = payload.toString().split(":");
-          this.m_eventCallback!({
+          if (this.m_callbacks.events) this.m_callbacks.events({
             source: a[0] as DluxEventSource,
             n: Number(a[1]),
             value: Number(a[2]),

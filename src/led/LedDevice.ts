@@ -3,9 +3,18 @@ import { DluxMqttDevice } from "../mqtt/DluxMqttDevice";
 import { DluxColorType, DluxSceneType, DluxLedAction } from "./enums";
 import { DluxLedState, IScene, ISceneFlow, ISceneStatic, ISceneSwap } from "./interfaces";
 import { Color, MS100, Swaps } from "./types";
-import { DluxEventCallbackSignature, IDluxSubscription, IDluxLogger } from "../mqtt/types";
+import { IDluxSubscription } from "../mqtt/types";
 
-export class DluxLedDevice extends DluxMqttDevice {
+type BaseOptions = ConstructorParameters<typeof DluxMqttDevice>[0];
+interface Callbacks extends NonNullable<BaseOptions["callbacks"]> {
+  state?: (newState: DluxLedState) => void;
+};
+interface Options extends BaseOptions {
+  rgbw?: boolean;
+  callbacks?: Callbacks;
+}
+
+export class DluxLedDevice extends DluxMqttDevice<Callbacks> {
   public readonly rgbw: boolean;
   public state: DluxLedState = {
     scene: DluxSceneType.ERROR,
@@ -17,16 +26,7 @@ export class DluxLedDevice extends DluxMqttDevice {
 
   private m_buffer: Buffer = Buffer.from("");
 
-  constructor(o: {
-    // DluxMqttDevice
-    name: string;
-    topic: string;
-    eventCallback?: DluxEventCallbackSignature;
-    logger?: IDluxLogger;
-
-    // Own
-    rgbw?: boolean;
-  }) {
+  constructor(o: Options) {
     super(o);
     this.rgbw = o.rgbw || false;
   }
@@ -42,7 +42,10 @@ export class DluxLedDevice extends DluxMqttDevice {
     return super.deviceSubscriptions().concat([
       {
         topic: this.topic + "/states",
-        callback: msg => (this.m_state = status(msg.toString())),
+        callback: msg => {
+          this.state = status(msg.toString());
+          if (this.m_callbacks.state) this.m_callbacks.state(this.state);
+        },
       },
     ]);
   }

@@ -1,11 +1,3 @@
-export enum DluxEventSource {
-  DLUX_BUTTON = "D",
-  GPIO_INPUT = "I",
-  GIPO_OUTPUT = "O",
-}
-
-export type DluxEventCallbackSignature = (event: IDluxEvent) => void;
-
 export interface IDluxSubscription {
   topic: string;
   callback: (paylaod: Buffer) => void;
@@ -31,6 +23,15 @@ export interface IDluxLogger {
   warn: (msg: any) => void;
   error: (msg: any) => void;
   fatal: (msg: any) => void;
+}
+
+export type DluxInput = number | boolean | undefined;
+export type DluxOutput = boolean | undefined;
+
+export enum DluxEventSource {
+  DLUX_BUTTON = "D",
+  GPIO_INPUT = "I",
+  GIPO_OUTPUT = "O",
 }
 
 export interface IDluxEvent {

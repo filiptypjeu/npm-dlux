@@ -1,23 +1,23 @@
 import { DluxMqttDevice } from "../mqtt/DluxMqttDevice";
-import { DluxEventCallbackSignature, IDluxSubscription, IDluxLogger } from "../mqtt/types";
+import { IDluxSubscription } from "../mqtt/types";
 
 type Temperature = number | null;
 
-export class DluxTempiraturDevice extends DluxMqttDevice {
+type BaseOptions = ConstructorParameters<typeof DluxMqttDevice>[0];
+interface Callbacks extends NonNullable<BaseOptions["callbacks"]> {
+  temperatures?: (newAverage: Temperature, newTemps: Temperature[]) => void;
+};
+interface Options extends BaseOptions {
+  order?: string[];
+  callbacks?: Callbacks;
+}
+
+export class DluxTempiraturDevice extends DluxMqttDevice<Callbacks> {
   public readonly order: string[] | undefined;
   public temperatures: Temperature[];
   public average: Temperature = null;
 
-  constructor(o: {
-    // DluxMqttDevice
-    name: string;
-    topic: string;
-    eventCallback?: DluxEventCallbackSignature;
-    logger?: IDluxLogger;
-
-    // Own
-    order?: string[];
-  }) {
+  constructor(o: Options) {
     super(o);
     this.order = o.order;
     this.temperatures = new Array(this.order?.length || 0).fill(null);
@@ -29,6 +29,7 @@ export class DluxTempiraturDevice extends DluxMqttDevice {
         topic: this.topic + "/temps",
         callback: payload => {
           this.parseTemperatures(payload);
+          if (this.m_callbacks.temperatures) this.m_callbacks.temperatures(this.average, this.temperatures);
         }
       },
     ]);
