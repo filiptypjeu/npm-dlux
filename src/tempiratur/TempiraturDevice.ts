@@ -37,7 +37,7 @@ export class DluxTempiraturDevice extends DluxMqttDevice {
   protected override deviceSubscriptions(): IDluxSubscription[] {
     return super.deviceSubscriptions().concat([
       {
-        topic: this.temperaturesTopic,
+        topic: this.topic + "/temps",
         callback: msg => this.parseTemperatureMessage(msg),
       },
     ]);
