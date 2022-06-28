@@ -22,6 +22,6 @@ test("dlux lamp device default lamp states", () => {
 });
 
 test("dlux lamp device lamp state callback", () => {
-  subs[4].callback(Buffer.from("10110010--------"));
+  subs[4].callback(Buffer.from("10110010--------"), "");
   expect(d.lamps).toEqual("10110010--------");
 });

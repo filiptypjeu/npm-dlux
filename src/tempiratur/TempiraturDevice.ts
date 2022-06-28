@@ -6,6 +6,7 @@ type Temperature = number | null;
 type BaseOptions = ConstructorParameters<typeof DluxMqttDevice>[0];
 interface Callbacks extends NonNullable<BaseOptions["callbacks"]> {
   temperatures?: (newAverage: Temperature, newTemps: Temperature[]) => void;
+  text?: (row: number, newText: string) => void;
 };
 interface Options extends BaseOptions {
   order?: string[];
@@ -16,6 +17,7 @@ export class DluxTempiraturDevice extends DluxMqttDevice<Callbacks> {
   public readonly order: string[] | undefined;
   public temperatures: Temperature[];
   public average: Temperature = null;
+  public text: { [row: number]: string | undefined } = {};
 
   constructor(o: Options) {
     super(o);
@@ -30,6 +32,16 @@ export class DluxTempiraturDevice extends DluxMqttDevice<Callbacks> {
         callback: payload => {
           this.parseTemperatures(payload);
           if (this.m_callbacks.temperatures) this.m_callbacks.temperatures(this.average, this.temperatures);
+        }
+      },
+      {
+        topic: this.topic + "/text/+",
+        callback: (payload, topic) => {
+          const row = Number(topic.split("/").reverse()[0]) || 0;
+          if (!row) return;
+          const s = payload.toString();
+          this.text[row] = s;
+          if (this.m_callbacks.text) this.m_callbacks.text(row, s);
         }
       },
     ]);

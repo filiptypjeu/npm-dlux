@@ -26,17 +26,17 @@ test("dlux mqtt device subscription topics", () => {
 test("dlux mqtt device status callback", () => {
   expect(d.online).toEqual(false);
   expect(d.status).toEqual("offline");
-  subs[0].callback(Buffer.from("online"));
+  subs[0].callback(Buffer.from("online"), "");
   expect(d.online).toEqual(true);
   expect(d.status).toEqual("online");
-  subs[0].callback(Buffer.from("disconnected"));
+  subs[0].callback(Buffer.from("disconnected"), "");
   expect(d.online).toEqual(false);
   expect(d.status).toEqual("disconnected");
 });
 
 test("dlux mqtt device version callback", () => {
   expect(d.version).toEqual("");
-  subs[1].callback(Buffer.from("v.1.0"));
+  subs[1].callback(Buffer.from("v.1.0"), "");
   expect(d.version).toEqual("v.1.0");
 });
 

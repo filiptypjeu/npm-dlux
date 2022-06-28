@@ -1,6 +1,9 @@
+type Callback = (payload: Buffer, topic: string) => void;
+type CallbackReversed = (topic: string, payload: Buffer) => void;
+
 export interface IDluxSubscription {
   topic: string;
-  callback: (paylaod: Buffer) => void;
+  callback: Callback;
 }
 
 interface IClientBase {
@@ -9,11 +12,11 @@ interface IClientBase {
 
 export interface IDluxMqttClientInternalHandling extends IClientBase {
   subscribe(topic: string): void;
-  addListener(event: "message", callback: (topic: string, payload: Buffer) => void): void;
+  addListener(event: "message", callback: CallbackReversed): void;
 }
 
 export interface IDluxMqttClientExternalHandling extends IClientBase {
-  addSubscription(topic: string, callback: (payload: Buffer) => void): void;
+  addSubscription(topic: string, callback: Callback): void;
 }
 
 export type IDluxMqttClient = IDluxMqttClientInternalHandling | IDluxMqttClientExternalHandling;
