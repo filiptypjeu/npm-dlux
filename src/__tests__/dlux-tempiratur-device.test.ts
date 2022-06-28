@@ -29,15 +29,23 @@ test("dlux tempiratur device temperature callback", () => {
 });
 
 test("dlux tempiratur device temperature callback with order", () => {
-  d.order = ["B2", "A1"];
-  subs[4].callback(Buffer.from("A1:30.0,B2:60.48"));
-  expect(d.temperatures).toEqual([60.48, 30.0]);
-  expect(d.average).toEqual(45.24);
+  const d2 = new DluxTempiraturDevice({
+    name: "pi",
+    topic: "dlux/pi",
+    order: ["B2", "A1"],
+  });
+  d2.subscriptions[4].callback(Buffer.from("A1:30.0,B2:60.48"));
+  expect(d2.temperatures).toEqual([60.48, 30.0]);
+  expect(d2.average).toEqual(45.24);
 });
 
 test("dlux tempiratur device temperature callback with null temps", () => {
-  d.order = ["B2", "C3", "A1"];
-  subs[4].callback(Buffer.from("A1:30.0,B2:no"));
-  expect(d.temperatures).toEqual([null, null, 30.0]);
-  expect(d.average).toEqual(30.0);
+  const d3 = new DluxTempiraturDevice({
+    name: "pi",
+    topic: "dlux/pi",
+    order: ["B2", "C3", "A1"],
+  });
+  d3.subscriptions[4].callback(Buffer.from("A1:30.0,B2:no"));
+  expect(d3.temperatures).toEqual([null, null, 30.0]);
+  expect(d3.average).toEqual(30.0);
 });
