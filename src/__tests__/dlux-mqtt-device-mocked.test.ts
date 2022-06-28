@@ -1,14 +1,22 @@
-import { DluxEventSource, DluxMqttDevice, IDluxEvent } from "../index";
+import { DluxEventSource, DluxMqttDevice } from "../index";
 import MqttClientMock from "./MqttClientMock.test";
+import CallbackMock from "./CallbackMock.test";
 
 const client = new MqttClientMock();
-
-const events: IDluxEvent[] = [];
+const sMock = new CallbackMock();
+const eMock = new CallbackMock();
+const iMock = new CallbackMock();
+const oMock = new CallbackMock();
 
 const d = new DluxMqttDevice({
   name: "device",
   topic: "dlux/l1",
-  eventCallback: (e: IDluxEvent) => events.push(e),
+  callbacks: {
+    status: sMock.mock,
+    inputs: iMock.mock,
+    outputs: oMock.mock,
+    events: eMock.mock,
+  }
 }).initialize(client);
 
 test("mocked client inital publishes", () => {
@@ -25,6 +33,7 @@ test("mocked client inital listeners", () => {
 });
 
 test("dlux mqtt device mocked status topic", () => {
+  expect(sMock.calls).toHaveLength(0);
   expect(d.online).toEqual(false);
   expect(d.status).toEqual("offline");
   client.mock("dlux/l1/status", Buffer.from("online"));
@@ -33,6 +42,10 @@ test("dlux mqtt device mocked status topic", () => {
   client.mock("dlux/l1/status", Buffer.from("disconnected"));
   expect(d.online).toEqual(false);
   expect(d.status).toEqual("disconnected");
+  expect(sMock.calls).toEqual([
+    ["online"],
+    ["disconnected"],
+  ]);
 });
 
 test("dlux mqtt device mocked version topic", () => {
@@ -44,60 +57,51 @@ test("dlux mqtt device mocked version topic", () => {
 });
 
 test("dlux mqtt device mocked inputs topic", () => {
-  expect(d.inputs[0]).toEqual(undefined);
-  expect(d.inputs[1]).toEqual(undefined);
-  expect(d.inputs[2]).toEqual(undefined);
-  expect(d.inputs[3]).toEqual(undefined);
-  expect(d.inputs[4]).toEqual(undefined);
+  expect(iMock.calls).toHaveLength(0);
   client.mock("dlux/l1/inputs", Buffer.from("011:1:-:0"));
-  expect(d.inputs[0]).toEqual(11);
-  expect(d.inputs[1]).toEqual(true);
-  expect(d.inputs[2]).toEqual(undefined);
-  expect(d.inputs[3]).toEqual(false);
-  expect(d.inputs[4]).toEqual(undefined);
+  const inputs = [11, true, undefined, false, undefined, undefined, undefined, undefined];
+  expect(d.inputs).toEqual(inputs);
+  expect(iMock.calls).toEqual([[inputs]]);
 });
 
 test("dlux mqtt device mocked outputs topic", () => {
-  expect(d.outputs[0]).toEqual(undefined);
-  expect(d.outputs[1]).toEqual(undefined);
-  expect(d.outputs[2]).toEqual(undefined);
-  expect(d.outputs[3]).toEqual(undefined);
+  expect(oMock.calls).toHaveLength(0);
   client.mock("dlux/l1/outputs", Buffer.from("-10"));
-  expect(d.outputs[0]).toEqual(undefined);
-  expect(d.outputs[1]).toEqual(true);
-  expect(d.outputs[2]).toEqual(false);
-  expect(d.outputs[3]).toEqual(undefined);
+  const outputs = [undefined, true, false, undefined, undefined, undefined, undefined, undefined];
+  expect(d.outputs).toEqual(outputs);
+  expect(oMock.calls).toEqual([[outputs]]);
 });
 
 test("dlux mqtt device mocked event", () => {
-  expect(events).toHaveLength(0);
+  expect(eMock.calls).toHaveLength(0);
   client.mock("dlux/l1/events", Buffer.from("D:13:1"));
-  expect(events).toHaveLength(1);
   client.mock("dlux/l1/events", Buffer.from("I:5:0"));
-  expect(events).toHaveLength(2);
   client.mock("dlux/l1/events", Buffer.from("a:a:a:a"));
-  expect(events).toHaveLength(3);
-  expect(events).toEqual([
-    {
+  expect(eMock.calls).toEqual([
+    [{
       source: DluxEventSource.DLUX_BUTTON,
       n: 13,
       value: 1,
-    },
-    {
+    }],
+    [{
       source: DluxEventSource.GPIO_INPUT,
       n: 5,
       value: 0,
-    },
-    {
+    }],
+    [{
       source: "a",
       n: NaN,
       value: NaN,
-    },
+    }],
   ]);
 });
 
-test("mocked client state after tests", () => {
+test("mocked states after tests", () => {
   expect(client.publishes).toHaveLength(0);
   expect(client.subscriptions).toHaveLength(5);
   expect(client.listeners).toHaveLength(1);
+  expect(sMock.calls).toHaveLength(2);
+  expect(eMock.calls).toHaveLength(3);
+  expect(iMock.calls).toHaveLength(1);
+  expect(oMock.calls).toHaveLength(1);
 });

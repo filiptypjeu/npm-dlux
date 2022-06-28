@@ -1,12 +1,16 @@
-import { DluxLampDevice } from "../index";
-import { DluxLampCommand } from "../lamp/enums";
+import { DluxLampDevice, DluxLampCommand } from "../index";
+import CallbackMock from "./CallbackMock.test";
 import MqttClientMock from "./MqttClientMock.test";
 
 const client = new MqttClientMock();
+const lMock = new CallbackMock();
 
 const d = new DluxLampDevice({
   name: "device",
   topic: "dlux/gt",
+  callbacks: {
+    lamps: lMock.mock,
+  }
 });
 d.initialize(client);
 
@@ -24,9 +28,11 @@ test("mocked client inital listeners", () => {
 });
 
 test("dlux lamp device mocked lamp states", () => {
+  expect(lMock.calls).toHaveLength(0);
   expect(d.lamps).toEqual("");
   client.mock("dlux/gt/lamps", Buffer.from("1-1-0"));
   expect(d.lamps).toEqual("1-1-0");
+  expect(lMock.calls).toEqual([["1-1-0"]]);
 });
 
 test("dlux lamp device mocked set one lamp", () => {
@@ -65,4 +71,5 @@ test("mocked client state after tests", () => {
   expect(client.publishes).toHaveLength(6);
   expect(client.subscriptions).toHaveLength(5);
   expect(client.listeners).toHaveLength(1);
+  expect(lMock.calls).toHaveLength(1);
 });
