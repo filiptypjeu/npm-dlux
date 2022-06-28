@@ -8,8 +8,6 @@ const d = new DluxLampDevice({
 test("dlux lamp device basic properties", () => {
   expect(d.name).toEqual("gatan");
   expect(d.topic).toEqual("dlux/gt");
-  expect(d.lampsTopic).toEqual("dlux/gt/lamps");
-  expect(d.setLampsTopic).toEqual("dlux/gt/l");
 });
 
 const subs = d.subscriptions;

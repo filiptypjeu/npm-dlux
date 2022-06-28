@@ -16,30 +16,10 @@ export class DluxLampDevice extends DluxMqttDevice {
     super(o);
   }
 
-  /**
-   * Get the topic in which the device publishes its current lamp states.
-   */
-  public get lampsTopic(): string {
-    return this.topic + "/lamps";
-  }
-  /**
-   * Get the topic in which the device can be sent lamp commands.
-   */
-  public get setLampsTopic(): string {
-    return this.topic + "/l";
-  }
-
-  /**
-   * Get the current states of the lamps of this device.
-   */
-  public get lamps(): string {
-    return this.m_lamps;
-  }
-
   protected override deviceSubscriptions(): IDluxSubscription[] {
     return super.deviceSubscriptions().concat([
       {
-        topic: this.lampsTopic,
+        topic: this.topic + "/lamps",
         callback: msg => (this.m_lamps = msg.toString()),
       },
     ]);
@@ -47,7 +27,7 @@ export class DluxLampDevice extends DluxMqttDevice {
 
   public setLamp(lamp: DluxLamp): void {
     if (lamp.index < 0) return;
-    this._publish(`${this.setLampsTopic}/${lamp.index + 1}`, lamp.state);
+    this._publish(`${this.topic}/l/${lamp.index + 1}`, lamp.state);
   }
 
   public setLamps(lamps: DluxLamp[]): void {
@@ -76,6 +56,6 @@ export class DluxLampDevice extends DluxMqttDevice {
       a[lamp.index] = lamp.state;
     }
 
-    this._publish(this.setLampsTopic, a.join(""));
+    this._publish(this.topic + "/l", a.join(""));
   }
 }

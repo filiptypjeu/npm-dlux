@@ -7,14 +7,14 @@ import { DluxEventCallbackSignature, IDluxSubscription, IDluxLogger } from "../m
 
 export class DluxLedDevice extends DluxMqttDevice {
   public readonly rgbw: boolean;
-
-  private m_state: DluxLedState = {
+  public state: DluxLedState = {
     scene: DluxSceneType.ERROR,
     colorType: DluxColorType.ERROR,
     bufferSize: 0,
     sceneOn: false,
     sceneUpdating: false,
   };
+
   private m_buffer: Buffer = Buffer.from("");
 
   constructor(o: {
@@ -37,36 +37,11 @@ export class DluxLedDevice extends DluxMqttDevice {
   public get on(): boolean {
     return this.state.sceneOn && this.state.powerOn !== false;
   }
-  /**
-   * Get the topic in which the device publishes its current state.
-   */
-  public get statesTopic(): string {
-    return this.topic + "/states";
-  }
-  /**
-   * Get the topic in which the device can be sent actions.
-   */
-  public get actionTopic(): string {
-    return this.topic + "/a";
-  }
-  /**
-   * Get the topic in which the device can be sent scenes.
-   */
-  public get sceneTopic(): string {
-    return this.topic + "/s";
-  }
-
-  /**
-   * Get the current state of the LED device.
-   */
-  public get state(): DluxLedState {
-    return this.m_state;
-  }
 
   protected override deviceSubscriptions(): IDluxSubscription[] {
     return super.deviceSubscriptions().concat([
       {
-        topic: this.statesTopic,
+        topic: this.topic + "/states",
         callback: msg => (this.m_state = status(msg.toString())),
       },
     ]);
@@ -81,7 +56,7 @@ export class DluxLedDevice extends DluxMqttDevice {
 
   public scene<C extends Color>(scene: IScene<C> | Buffer): void {
     this.m_buffer = Buffer.isBuffer(scene) ? scene : encode(scene);
-    this._publish(this.sceneTopic, this.m_buffer);
+    this._publish(this.topic + "/s", this.m_buffer);
   }
 
   public static(color: Color): void {
@@ -112,7 +87,7 @@ export class DluxLedDevice extends DluxMqttDevice {
   }
 
   public action(a: DluxLedAction): void {
-    this._publish(this.actionTopic, a.toString());
+    this._publish(this.topic + "/a", a.toString());
   }
 
   public copyTo(device: DluxLedDevice): void {

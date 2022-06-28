@@ -1,20 +1,14 @@
 import { IDluxMqttClient, IDluxSubscription, IDluxMqttClientExternalHandling, IDluxLogger } from "./types";
 
-// XXX: Add HA support?
-
 export abstract class MqttDevice {
   public readonly name: string;
   public readonly logger: IDluxLogger | undefined;
 
-  protected readonly m_topic: string;
   private m_client: IDluxMqttClient | undefined;
 
-  protected m_status: string = "offline";
-
-  constructor(o: { name: string; topic: string; logger?: IDluxLogger }) {
+  constructor(o: { name: string; logger?: IDluxLogger }) {
     this.name = o.name;
     this.logger = o.logger;
-    this.m_topic = o.topic;
   }
 
   protected _publish(topic: string, buffer: Buffer | string) {
@@ -24,16 +18,6 @@ export abstract class MqttDevice {
   protected _fatal(msg: string) {
     this.logger?.fatal(msg);
     throw new Error(msg);
-  }
-
-  /**
-   * Get the device topic.
-   */
-  public get topic(): string {
-    if (!this.m_topic) {
-      throw this._fatal(`MqttDevice "${this.name}" does not have a topic"`);
-    }
-    return this.m_topic;
   }
 
   protected deviceSubscriptions(): IDluxSubscription[] {

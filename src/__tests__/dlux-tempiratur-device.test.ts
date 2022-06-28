@@ -8,8 +8,6 @@ const d = new DluxTempiraturDevice({
 test("dlux tempiratur device basic properties", () => {
   expect(d.name).toEqual("pi");
   expect(d.topic).toEqual("dlux/pi");
-  expect(d.temperaturesTopic).toEqual("dlux/pi/temps");
-  expect(d.textTopic).toEqual("dlux/pi/t");
 });
 
 const subs = d.subscriptions;

@@ -3,8 +3,7 @@ import { DluxEventCallbackSignature, IDluxSubscription, IDluxLogger } from "../m
 
 export class DluxTempiraturDevice extends DluxMqttDevice {
   public order: string[] | undefined;
-
-  private m_temps: (number | null)[] = [];
+  public temperatures: (number | null)[] = [];
 
   constructor(o: {
     // DluxMqttDevice
@@ -20,25 +19,6 @@ export class DluxTempiraturDevice extends DluxMqttDevice {
     this.order = o.order;
   }
 
-  /**
-   * Get the topic in which the device publishes the temperatures.
-   */
-  public get temperaturesTopic(): string {
-    return this.topic + "/temps";
-  }
-  /**
-   * Get the topic where the device can recieve text.
-   */
-  public get textTopic(): string {
-    return this.topic + "/t";
-  }
-
-  /**
-   * Get the current temperatures.
-   */
-  public get temperatures(): (number | null)[] {
-    return this.m_temps;
-  }
   /**
    * Get the current average temperature.
    */

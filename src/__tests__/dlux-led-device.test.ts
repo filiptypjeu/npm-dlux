@@ -5,9 +5,6 @@ const d = new DluxLedDevice({ name: "led", topic: "dlux/l2" });
 test("dlux mqtt led device basic properties", () => {
   expect(d.name).toEqual("led");
   expect(d.topic).toEqual("dlux/l2");
-  expect(d.statesTopic).toEqual("dlux/l2/states");
-  expect(d.actionTopic).toEqual("dlux/l2/a");
-  expect(d.sceneTopic).toEqual("dlux/l2/s");
   expect(d.on).toEqual(false);
 });
 

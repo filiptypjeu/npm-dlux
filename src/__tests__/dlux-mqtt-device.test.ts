@@ -8,10 +8,6 @@ const d = new DluxMqttDevice({
 test("dlux mqtt device basic properties", () => {
   expect(d.name).toEqual("device");
   expect(d.topic).toEqual("dlux/l1");
-  expect(d.statusTopic).toEqual("dlux/l1/status");
-  expect(d.versionTopic).toEqual("dlux/l1/version");
-  expect(d.inputsTopic).toEqual("dlux/l1/inputs");
-  expect(d.outputsTopic).toEqual("dlux/l1/outputs");
 });
 
 const subs = d.subscriptions;

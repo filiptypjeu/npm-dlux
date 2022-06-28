@@ -4,10 +4,10 @@ import { DluxEventSource, IDluxSubscription, IDluxLogger, DluxEventCallbackSigna
 // XXX: Add HA support?
 
 export class DluxMqttDevice extends MqttDevice {
-  protected m_version: string = "";
-  protected m_inputs: string = ":::::::";
-  protected m_outputs: string = "--------";
-  public readonly m_eventCallback: DluxEventCallbackSignature | undefined;
+  public readonly topic: string;
+
+  public status: string = "offline"; // XXX: Enum?
+  public version: string = "";
 
   constructor(o: {
     // MqttDevice
@@ -19,88 +19,39 @@ export class DluxMqttDevice extends MqttDevice {
     eventCallback?: DluxEventCallbackSignature;
   }) {
     super(o);
+    this.topic = o.topic;
     this.m_eventCallback = o.eventCallback;
   }
 
-  /**
-   * Get online status for the device.
-   */
-  public get status(): string {
-    return this.m_status;
-  }
-  /**
-   * Get online status for the device.
-   */
   public get online(): boolean {
-    return this.m_status === "online";
-  }
-  /**
-   * Get version of the device.
-   */
-  public get version(): string {
-    return this.m_version;
-  }
-
-  /**
-   * Get the topic in which the device publishes its status.
-   */
-  public get statusTopic(): string {
-    return this.topic + "/status";
-  }
-  /**
-   * Get the topic in which the device publishes its version.
-   */
-  public get versionTopic(): string {
-    return this.topic + "/version";
-  }
-  /**
-   * Get the topic in which the device publishes its output states.
-   */
-  public get outputsTopic(): string {
-    return this.topic + "/outputs";
-  }
-  /**
-   * Get the topic in which the device publishes its input states.
-   */
-  public get inputsTopic(): string {
-    return this.topic + "/inputs";
-  }
-  /**
-   * Get the topic in which the device publishes events.
-   */
-  public get eventsTopic(): string {
-    return this.topic + "/events";
+    return this.status === "online";
   }
 
   protected override deviceSubscriptions(): IDluxSubscription[] {
     let subs = super.deviceSubscriptions();
 
-    if (!this.m_topic) {
-      return subs;
-    }
-
     subs = subs.concat([
       {
-        topic: this.statusTopic,
+        topic: this.topic + "/status",
         callback: payload => (this.m_status = payload.toString()),
       },
       {
-        topic: this.versionTopic,
+        topic: this.topic + "/version",
         callback: payload => (this.m_version = payload.toString()),
       },
       {
-        topic: this.inputsTopic,
+        topic: this.topic + "/inputs",
         callback: payload => (this.m_inputs = payload.toString()),
       },
       {
-        topic: this.outputsTopic,
+        topic: this.topic + "/outputs",
         callback: payload => (this.m_outputs = payload.toString()),
       },
     ]);
 
     if (this.m_eventCallback) {
       subs.push({
-        topic: this.eventsTopic,
+        topic: this.topic + "/events",
         callback: payload => {
           const a = payload.toString().split(":");
           this.m_eventCallback!({
