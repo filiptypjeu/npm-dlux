@@ -14,7 +14,7 @@ test("dlux mqtt device basic properties", () => {
 const subs = d.subscriptions;
 
 test("dlux mqtt device subscriptions", () => {
-  expect(subs).toHaveLength(TOPICS_DLUX);
+  expect(subs.map(s => s.topic)).toEqual(TOPICS_DLUX.map(t => `dlux/l1/${t}`));
 });
 
 test("dlux mqtt device subscription topics", () => {
@@ -69,6 +69,35 @@ test("dlux mqtt device set outputs with callback", () => {
 
   expect(outputs).toHaveLength(8);
   expect(outputs).toEqual([undefined, undefined, false, true, true, undefined, undefined, false]);
+});
+
+test("dlux mqtt device default temperatures", () => {
+  expect(d.temperatures).toEqual([]);
+});
+
+test("dlux mqtt device temperature callback", () => {
+  subs.find(s => s.topic.includes("temps"))!.callback(Buffer.from("A1:30.0,B2:60.24"), "");
+  expect(d.temperatures).toEqual([30.0, 60.24]);
+});
+
+test("dlux mqtt device temperature callback with order", () => {
+  const d2 = new DluxMqttDevice({
+    name: "pi",
+    topic: "dlux/pi",
+    thermometerOrder: ["B2", "A1"],
+  });
+  d2.subscriptions.find(s => s.topic.includes("temps"))!.callback(Buffer.from("A1:30.0,B2:60.48"), "");
+  expect(d2.temperatures).toEqual([60.48, 30.0]);
+});
+
+test("dlux mqtt device temperature callback with null temps", () => {
+  const d3 = new DluxMqttDevice({
+    name: "pi",
+    topic: "dlux/pi",
+    thermometerOrder: ["B2", "C3", "A1"],
+  });
+  d3.subscriptions.find(s => s.topic.includes("temps"))!.callback(Buffer.from("A1:30.0,B2:no"), "");
+  expect(d3.temperatures).toEqual([null, null, 30.0]);
 });
 
 test("dlux mqtt device throw when no client", () => {

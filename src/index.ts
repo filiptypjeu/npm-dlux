@@ -11,4 +11,3 @@ export * from "./led/types";
 export * from "./mqtt/DluxMqttDevice";
 export * from "./mqtt/MqttDevice";
 export * from "./mqtt/types";
-export * from "./tempiratur/TempiraturDevice";

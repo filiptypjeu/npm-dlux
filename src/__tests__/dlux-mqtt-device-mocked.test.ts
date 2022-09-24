@@ -1,12 +1,15 @@
 import { DluxEventSource, DluxMqttDevice } from "../index";
 import MqttClientMock from "./MqttClientMock.test";
 import CallbackMock from "./CallbackMock.test";
+import { TOPICS_DLUX } from "./VARS";
 
 const client = new MqttClientMock();
 const sMock = new CallbackMock();
 const eMock = new CallbackMock();
 const iMock = new CallbackMock();
 const oMock = new CallbackMock();
+const tMock = new CallbackMock();
+const xMock = new CallbackMock();
 
 const d = new DluxMqttDevice({
   name: "device",
@@ -16,6 +19,8 @@ const d = new DluxMqttDevice({
     inputs: iMock.mock,
     outputs: oMock.mock,
     events: eMock.mock,
+    temperatures: tMock.mock,
+    text: xMock.mock,
   },
 }).initialize(client);
 
@@ -24,8 +29,7 @@ test("mocked client inital publishes", () => {
 });
 
 test("mocked client inital subscriptions", () => {
-  expect(client.subscriptions).toHaveLength(5);
-  expect(client.subscriptions).toEqual(["dlux/l1/status", "dlux/l1/version", "dlux/l1/inputs", "dlux/l1/outputs", "dlux/l1/events"]);
+  expect(client.subscriptions).toEqual(TOPICS_DLUX.map(t => `dlux/l1/${t}`));
 });
 
 test("mocked client inital listeners", () => {
@@ -99,12 +103,44 @@ test("dlux mqtt device mocked event", () => {
   ]);
 });
 
+test("dlux mqtt device mocked temperatures", () => {
+  expect(tMock.calls).toHaveLength(0);
+  expect(d.temperatures).toEqual([]);
+  const raw = "a:2.1,b:2.2,c:5.6";
+  client.mock("dlux/l1/temps", Buffer.from(raw));
+  const temps = [2.1, 2.2, 5.6];
+  expect(d.temperatures).toEqual(temps);
+  expect(tMock.calls).toEqual([[temps, raw]]);
+});
+
+test("dlux mqtt device mocked text", () => {
+  expect(xMock.calls).toHaveLength(0);
+  expect(d.text).toEqual({});
+  client.mock("dlux/l1/text/1", Buffer.from("AAA"));
+  client.mock("dlux/l1/text/2", Buffer.from("BBB"));
+  client.mock("dlux/l1/text/10", Buffer.from("CCC"));
+  client.mock("dlux/l1/text/2", Buffer.from("DDD"));
+  expect(d.text).toEqual({
+    1: "AAA",
+    2: "DDD",
+    10: "CCC",
+  });
+  expect(xMock.calls).toEqual([
+    [1, "AAA"],
+    [2, "BBB"],
+    [10, "CCC"],
+    [2, "DDD"],
+  ]);
+});
+
 test("mocked states after tests", () => {
   expect(client.publishes).toHaveLength(0);
-  expect(client.subscriptions).toHaveLength(5);
+  expect(client.subscriptions).toHaveLength(TOPICS_DLUX.length);
   expect(client.listeners).toHaveLength(1);
   expect(sMock.calls).toHaveLength(2);
   expect(eMock.calls).toHaveLength(3);
   expect(iMock.calls).toHaveLength(1);
   expect(oMock.calls).toHaveLength(1);
+  expect(tMock.calls).toHaveLength(1);
+  expect(xMock.calls).toHaveLength(4);
 });

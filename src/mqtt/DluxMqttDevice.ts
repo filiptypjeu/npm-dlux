@@ -4,15 +4,19 @@ import { DluxEventSource, IDluxSubscription, IDluxEvent, DluxInput, DluxOutput }
 const INPUTS = 8;
 const OUTPUTS = 8;
 
+type Temperature = number | null;
 type BaseOptions = Omit<ConstructorParameters<typeof MqttDevice>[0], "statusTopic" | "statusCallback">;
 interface Callbacks {
   status?: (newStatus: string) => void;
   inputs?: (newInputs: DluxInput[]) => void;
   outputs?: (newOutputs: DluxOutput[]) => void;
   events?: (event: IDluxEvent) => void;
+  temperatures?: (newTemps: Temperature[], newRaw: string) => void;
+  text?: (row: number, newText: string) => void;
 }
 interface Options<C> extends BaseOptions {
   topic: string;
+  thermometerOrder?: string[];
   callbacks?: C;
 }
 
@@ -20,6 +24,9 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
   public readonly topic: string;
   public inputs: DluxInput[] = (new Array(INPUTS) as DluxInput[]).fill(undefined); // XXX: Change to dynamic size?
   public outputs: DluxOutput[] = (new Array(OUTPUTS) as DluxOutput[]).fill(undefined); // XXX: Change to dynamic size?
+  public readonly order: string[] | undefined;
+  public temperatures: Temperature[];
+  public text: { [row: number]: string | undefined } = {};
   public status: string = "offline"; // XXX: Enum?
   public version: string = "";
 
@@ -28,6 +35,8 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
   constructor(o: Options<C>) {
     super({ ...o });
     this.topic = o.topic;
+    this.order = o.thermometerOrder;
+    this.temperatures = (new Array(this.order?.length || 0) as Temperature[]).fill(null);
     this.m_callbacks = o.callbacks || ({} as C);
   }
 
@@ -35,7 +44,15 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
     return this.status === "online";
   }
 
+  /**
+   * Output text to display, if the device have one.
+   */
+  public print(row: number, text: string): void {
+    this._publish(`t/${row}`, text);
+  }
+
   protected override deviceSubscriptions(): IDluxSubscription[] {
+    // XXX: Avoid subscribing if not necessary?
     const subs = super.deviceSubscriptions().concat([
       {
         topic: this.topic + "/status",
@@ -63,10 +80,7 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
           if (this.m_callbacks.outputs) this.m_callbacks.outputs(this.outputs);
         },
       },
-    ]);
-
-    if (this.m_callbacks.events) {
-      subs.push({
+      {
         topic: this.topic + "/events",
         callback: payload => {
           const a = payload.toString().split(":");
@@ -77,8 +91,25 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
               value: Number(a[2]),
             });
         },
-      });
-    }
+      },
+      {
+        topic: this.topic + "/temps",
+        callback: payload => {
+          this.parseTemperatures(payload);
+          if (this.m_callbacks.temperatures) this.m_callbacks.temperatures(this.temperatures, payload.toString());
+        },
+      },
+      {
+        topic: this.topic + "/text/+",
+        callback: (payload, topic) => {
+          const row = Number(topic.split("/").reverse()[0]) || 0;
+          if (!row) return;
+          const s = payload.toString();
+          this.text[row] = s;
+          if (this.m_callbacks.text) this.m_callbacks.text(row, s);
+        },
+      },
+    ]);
 
     return subs;
   }
@@ -111,5 +142,31 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
 
   private static stringToValue(str: string): number | boolean | undefined {
     return str.length === 3 ? Number(str) : DluxMqttDevice.stringToBool(str);
+  }
+
+  private parseTemperatures(payload: Buffer): void {
+    const msg = payload.toString();
+
+    // Get names and temperatures of the thermometers
+    const names: string[] = msg.split(",").map(s => s.split(":")[0]);
+    const temps: (number | null)[] = msg.split(",").map(s => {
+      const value = s.split(":")[1];
+      // If value is empty
+      if (!value) {
+        return null;
+      }
+      const n = Number(value);
+      return Number.isNaN(n) ? null : n;
+    });
+
+    if (this.order) {
+      // XXX: this.temps = this.order.map(...)?
+      for (let i = 0; i < this.order.length; i++) {
+        const j = names.indexOf(this.order[i]);
+        this.temperatures[i] = j >= 0 ? temps[j] : null;
+      }
+    } else {
+      this.temperatures = temps;
+    }
   }
 }
