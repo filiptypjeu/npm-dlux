@@ -1,6 +1,6 @@
 import { DluxLedDevice, DluxLedMultiDevice } from "../index";
 import MqttClientMock from "./MqttClientMock.test";
-import { TOPICS_LED } from "./VARS"
+import { TOPICS_LED } from "./VARS";
 
 const client = new MqttClientMock();
 
@@ -11,12 +11,12 @@ d;
 
 test("mocked client inital state", () => {
   expect(client.publishes).toHaveLength(0);
-  expect(client.subscriptions).toHaveLength(2*TOPICS_LED.length);
+  expect(client.subscriptions).toHaveLength(2 * TOPICS_LED.length);
   expect(client.listeners).toHaveLength(2);
 });
 
 test("mocked client state after tests", () => {
   expect(client.publishes).toHaveLength(0);
-  expect(client.subscriptions).toHaveLength(2*TOPICS_LED.length);
+  expect(client.subscriptions).toHaveLength(2 * TOPICS_LED.length);
   expect(client.listeners).toHaveLength(2);
 });
