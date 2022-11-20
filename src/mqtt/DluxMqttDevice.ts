@@ -133,6 +133,22 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
         },
       },
       {
+        topic: this.topic + "/variables/+",
+        callback: (payload, topic) => {
+          const index = Number(topic.split("/").reverse()[0]) || 0;
+          if (!index) return;
+          const [name, value, defaultValue] = payload.toString().split(":");
+          const v = Number(value);
+          this.cacheVariable({
+            index,
+            name,
+            value: v,
+            binary: Number.isNaN(v) ? "" : `00000000${v.toString(2)}`.slice(-8),
+            defaultValue: Number(defaultValue),
+          });
+        },
+      },
+      {
         topic: this.topic + "/log",
         callback: payload => {
           const str = payload.toString().slice(5);
@@ -140,7 +156,7 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
             const [_V, n, name, _E, value, defaultValue, _B, binary] = str.split(" ");
             const index = Number(n.slice(0, -1));
             if (!index || !name) return;
-            this.variables = this.variables.filter(v => v.index !== index && v.name !== name).concat({
+            this.cacheVariable({
               index,
               name,
               value: Number(value),
@@ -153,6 +169,10 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
     ]);
 
     return subs;
+  }
+
+  private cacheVariable(variable: DluxVariable): void {
+    this.variables = this.variables.filter(v => v.index !== variable.index && v.name !== variable.name).concat(variable);
   }
 
   private parseInputs(payload: Buffer): void {
