@@ -6,6 +6,13 @@ const OUTPUTS = 8;
 
 type Temperature = number | null;
 type BaseOptions = Omit<ConstructorParameters<typeof MqttDevice>[0], "statusTopic" | "statusCallback">;
+interface DluxVariable {
+  index: number;
+  name: string;
+  value: number;
+  defaultValue: number;
+};
+
 interface Callbacks {
   status?: (newStatus: string) => void;
   inputs?: (newInputs: DluxInput[]) => void;
@@ -24,6 +31,7 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
   public readonly topic: string;
   public inputs: DluxInput[] = (new Array(INPUTS) as DluxInput[]).fill(undefined); // XXX: Change to dynamic size?
   public outputs: DluxOutput[] = (new Array(OUTPUTS) as DluxOutput[]).fill(undefined); // XXX: Change to dynamic size?
+  public variables: DluxVariable[] = [];
   public readonly order: string[] | undefined;
   public temperatures: Temperature[];
   public text: { [row: number]: string | undefined } = {};
@@ -51,6 +59,16 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
     this._publish(`t/${row}`, text);
   }
 
+  public getVariable(nameOrIndex: string | number): DluxVariable | undefined {
+    return typeof nameOrIndex === "number" ? this.variables.find(v => v.index === nameOrIndex) : this.variables.find(v => v.name === nameOrIndex);
+  }
+
+  public setVariable(nameOrIndex: string | number, value: number): void {
+    const index = typeof nameOrIndex === "number" ? nameOrIndex : this.getVariable(nameOrIndex)?.index;
+    if (!index) return;
+    this._publish(`${this.topic}/v/${index}`, value.toString());
+  }
+
   protected override deviceSubscriptions(): IDluxSubscription[] {
     // XXX: Avoid subscribing if not necessary?
     const subs = super.deviceSubscriptions().concat([
@@ -59,6 +77,10 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
         callback: payload => {
           const s = payload.toString();
           this.status = s;
+          if (this.online) {
+            this.variables = [];
+            this._publish(this.topic + "/v", "");
+          }
           if (this.m_callbacks.status) this.m_callbacks.status(s);
         },
       },
@@ -107,6 +129,23 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
           const s = payload.toString();
           this.text[row] = s;
           if (this.m_callbacks.text) this.m_callbacks.text(row, s);
+        },
+      },
+      {
+        topic: this.topic + "/log",
+        callback: payload => {
+          const str = payload.toString().slice(5);
+          if (str.startsWith("Variable ")) {
+            const [_V, n, name, _E, value, defaultValue] = str.split(" ");
+            const index = Number(n.slice(0, -1));
+            if (!index || !name) return;
+            this.variables = this.variables.filter(v => v.index !== index && v.name !== name).concat({
+              index,
+              name,
+              value: Number(value),
+              defaultValue: Number(defaultValue.slice(1)),
+            });
+          }
         },
       },
     ]);

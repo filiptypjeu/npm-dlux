@@ -12,7 +12,8 @@ export abstract class MqttDevice {
   }
 
   protected _publish(topic: string, buffer: Buffer | string) {
-    this.client.publish(topic, buffer);
+    if (!this.m_client) return;
+    this.m_client.publish(topic, buffer);
   }
 
   protected _fatal(msg: string) {
