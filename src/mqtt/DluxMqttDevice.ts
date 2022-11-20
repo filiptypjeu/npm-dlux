@@ -12,7 +12,7 @@ export interface DluxVariable {
   value: number;
   binary: string;
   defaultValue: number;
-};
+}
 
 interface Callbacks {
   status?: (newStatus: string) => void;
@@ -65,7 +65,7 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
   }
 
   public setVariable(nameOrIndex: string | number, value: number | string): void {
-    const index = typeof nameOrIndex === "number" ? nameOrIndex : this.variables.find(v => v.name === nameOrIndex)?.index;
+    const index = typeof nameOrIndex === "number" ? nameOrIndex : (this.variables.find(v => v.name === nameOrIndex)?.index || 0);
     if (!index) return this.logger?.warn(`Could not find variable ${index} on device ${this.name}`);
     this._publish(`${this.topic}/v/${index}`, value.toString());
   }
