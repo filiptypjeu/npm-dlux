@@ -6,10 +6,11 @@ const OUTPUTS = 8;
 
 type Temperature = number | null;
 type BaseOptions = Omit<ConstructorParameters<typeof MqttDevice>[0], "statusTopic" | "statusCallback">;
-interface DluxVariable {
+export interface DluxVariable {
   index: number;
   name: string;
   value: number;
+  binary: string;
   defaultValue: number;
 };
 
@@ -63,9 +64,9 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
     return typeof nameOrIndex === "number" ? this.variables.find(v => v.index === nameOrIndex) : this.variables.find(v => v.name === nameOrIndex);
   }
 
-  public setVariable(nameOrIndex: string | number, value: number): void {
-    const index = typeof nameOrIndex === "number" ? nameOrIndex : this.getVariable(nameOrIndex)?.index;
-    if (!index) return;
+  public setVariable(nameOrIndex: string | number, value: number | string): void {
+    const index = typeof nameOrIndex === "number" ? nameOrIndex : this.variables.find(v => v.name === nameOrIndex)?.index;
+    if (!index) return this.logger?.warn(`Could not find variable ${index} on device ${this.name}`);
     this._publish(`${this.topic}/v/${index}`, value.toString());
   }
 
@@ -136,13 +137,14 @@ export class DluxMqttDevice<C extends Callbacks = Callbacks> extends MqttDevice 
         callback: payload => {
           const str = payload.toString().slice(5);
           if (str.startsWith("Variable ")) {
-            const [_V, n, name, _E, value, defaultValue] = str.split(" ");
+            const [_V, n, name, _E, value, defaultValue, _B, binary] = str.split(" ");
             const index = Number(n.slice(0, -1));
             if (!index || !name) return;
             this.variables = this.variables.filter(v => v.index !== index && v.name !== name).concat({
               index,
               name,
               value: Number(value),
+              binary: binary.slice(0, -1),
               defaultValue: Number(defaultValue.slice(1)),
             });
           }
