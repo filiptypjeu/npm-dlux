@@ -37,10 +37,12 @@ test("mocked client inital listeners", () => {
 });
 
 test("dlux mqtt device mocked status topic", () => {
+  expect(client.publishes).toHaveLength(0);
   expect(sMock.calls).toHaveLength(0);
   expect(d.online).toEqual(false);
   expect(d.status).toEqual("offline");
   client.mock("dlux/l1/status", Buffer.from("online"));
+  expect(client.publishes).toEqual([{ topic: "dlux/l1/v", payload: "" }]);
   expect(d.online).toEqual(true);
   expect(d.status).toEqual("online");
   client.mock("dlux/l1/status", Buffer.from("disconnected"));
@@ -133,8 +135,124 @@ test("dlux mqtt device mocked text", () => {
   ]);
 });
 
+test("dlux mqtt device mocked variables", () => {
+  client.mock("dlux/l1/variables/3", Buffer.from("my_var:5:55"));
+  client.mock("dlux/l1/variables/4", Buffer.from("my_other_var:6:66"));
+  expect(d.variables).toEqual([
+    {
+      index: 3,
+      name: "my_var",
+      value: 5,
+      binary: "00000101",
+      defaultValue: 55,
+    },
+    {
+      index: 4,
+      name: "my_other_var",
+      value: 6,
+      binary: "00000110",
+      defaultValue: 66,
+    },
+  ]);
+
+  client.mock("dlux/l1/variables/3", Buffer.from("my_other_var:10:11"));
+  expect(d.variables).toEqual([
+    {
+      index: 3,
+      name: "my_other_var",
+      value: 10,
+      binary: "00001010",
+      defaultValue: 11,
+    },
+  ]);
+
+  client.mock("dlux/l1/variables/3", Buffer.from("my_var:A:B"));
+  expect(d.variables).toEqual([
+    {
+      index: 3,
+      name: "my_var",
+      value: NaN,
+      binary: "",
+      defaultValue: NaN,
+    },
+  ]);
+});
+
+test("dlux mqtt device mocked variables", () => {
+  client.mock("dlux/l1/log", Buffer.from("[l1] Variable 10: my_var = 15 (10 | 10101010)"));
+  client.mock("dlux/l1/log", Buffer.from("[l1] Variable 5: my_other_var = 123 (155 | 00000000)"));
+  expect(d.variables).toEqual([
+    {
+      index: 10,
+      name: "my_var",
+      value: 15,
+      binary: "10101010",
+      defaultValue: 10,
+    },
+    {
+      index: 5,
+      name: "my_other_var",
+      value: 123,
+      binary: "00000000",
+      defaultValue: 155,
+    },
+  ]);
+
+  client.mock("dlux/l1/log", Buffer.from("[l1] Variable 5: my_var = 0 (1 | 11111111)"));
+  expect(d.variables).toEqual([
+    {
+      index: 5,
+      name: "my_var",
+      value: 0,
+      binary: "11111111",
+      defaultValue: 1,
+    },
+  ]);
+
+  client.mock("dlux/l1/log", Buffer.from("[l1] Variable 5: my_var = A (B | ABC)"));
+  const V = d.variables;
+  expect(V).toEqual([
+    {
+      index: 5,
+      name: "my_var",
+      value: NaN,
+      binary: "ABC",
+      defaultValue: NaN,
+    },
+  ]);
+
+  client.mock("dlux/l1/log", Buffer.from("[l1] Variable N: my_var = 0 (1 | 10101010)"));
+  expect(d.variables).toEqual(V);
+
+  client.mock("dlux/l1/log", Buffer.from("[l1] Variable1: my_var = 0 (1 | 10101010)"));
+  expect(d.variables).toEqual(V);
+
+  client.mock("dlux/l1/log", Buffer.from("[l11] Variable 1: my_var = 0 (1 | 10101010)"));
+  expect(d.variables).toEqual(V);
+
+  d.setVariable("my_var", 123);
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/5", payload: "123" });
+  d.setVariable("my_other_var", 321);
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/5", payload: "123" });
+  d.setVariable(11, 222);
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/11", payload: "222" });
+  d.setVariable(123, "b1100");
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/123", payload: "b1100" });
+});
+
+test("dlux mqtt device mocked set variables", () => {
+  d.setVariable("my_var", 123);
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/5", payload: "123" });
+  d.setVariable("my_other_var", 321);
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/5", payload: "123" });
+  d.setVariable(11, 222);
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/11", payload: "222" });
+  d.setVariable(123, "b1100");
+  expect(client.lastPublish).toEqual({ topic: "dlux/l1/v/123", payload: "b1100" });
+});
+
 test("mocked states after tests", () => {
-  expect(client.publishes).toHaveLength(0);
+  expect(client.publishes).toHaveLength(7);
   expect(client.subscriptions).toHaveLength(TOPICS_DLUX.length);
   expect(client.listeners).toHaveLength(1);
   expect(sMock.calls).toHaveLength(2);

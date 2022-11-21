@@ -100,6 +100,15 @@ test("dlux mqtt device temperature callback with null temps", () => {
   expect(d3.temperatures).toEqual([null, null, 30.0]);
 });
 
+test("dlux mqtt device default text", () => {
+  expect(d.text).toEqual({});
+});
+
+test("dlux mqtt device default variables", () => {
+  expect(d.variables).toEqual([]);
+  expect(d.getVariable("myvar")).toEqual(undefined);
+});
+
 test("dlux mqtt device throw when no client", () => {
   expect(() => d.client).toThrow();
 });
